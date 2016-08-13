@@ -1,0 +1,21 @@
+{
+    "name": "sharf/myphp",
+    "description": "The OnePhp Framework.",
+    "keywords": ["framework", "sharf","myphp"],
+    "license": "MIT",
+    "homepage": "http://",
+    "authors": [
+        {
+            "name": "sharf",
+            "email": "373455742@qq.com",
+        }
+    ],
+    "require": {
+        "php": ">=5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "myphp\\": "src/"
+        }
+    }
+}
