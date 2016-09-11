@@ -1,7 +1,7 @@
 <?php
 namespace System;
 
-class Autoloader
+class AutoLoader
 {
     public static function loadByNamespace($name)
     {
@@ -17,12 +17,7 @@ class Autoloader
         //echo $class_file.'<br><br><br>';
         if (is_file($class_file)) {
             include_once $class_file;
-            if (class_exists($name, false)) {
-                return true;
-            }
         }
-        return false;
     }
 }
-
-spl_autoload_register('\System\Autoloader::loadByNamespace');
+spl_autoload_register('\System\AutoLoader::loadByNamespace');
