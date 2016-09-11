@@ -15,7 +15,10 @@
     },
     "autoload": {
         "psr-4": {
-            "myphp\\": "src/"
-        }
+            "MyPhp\\": "src/"
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     }
 }
