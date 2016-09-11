@@ -6,23 +6,20 @@ class DB
 {
     //实例数组
     protected static $instance = array();
-    protected static $instance_name;
+    protected static $config;
+
     /**
-     * @param null $config_name
      * @return \System\Lib\DbConnection
      */
-    public static function instance($config_name = null)
+    public static function instance($config = null)
     {
-        if ($config_name == null) {
-            $config_name = self::$instance_name;
-        }else{
-            self::$instance_name=$config_name;
+        if ($config == null) {
+            $config = self::$config;
+        } else {
+            self::$config = $config;
         }
-        if (!isset(\App\Config::$$config_name)) {
-            echo "Config::$config_name not set\n";
-        }
-        if (empty(self::$instance[$config_name])) {
-            $config = \App\Config::$$config_name;
+        $config_name = $config['host'] . $config['port'] . $config['dbname'];
+        if (!isset(self::$instance[$config_name])) {
             self::$instance[$config_name] = new DbConnection($config['host'], $config['port'], $config['user'], $config['password'], $config['dbname'], $config['charset'], $config['dbfix']);
         }
         return self::$instance[$config_name];
@@ -30,9 +27,7 @@ class DB
 
     public static function dbfix()
     {
-        $config_name=self::$instance_name;
-        $config = \App\Config::$$config_name;
-        return $config['dbfix'];
+        return self::$config['dbfix'];
     }
 
     /**
@@ -115,7 +110,7 @@ class DbConnection
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
         } catch (\PDOException $e) {
-            //$this->error_msg($e->getMessage());
+            $this->error_msg($e->getMessage());
             die('数据库连接失败！');
         }
     }
@@ -159,26 +154,26 @@ class DbConnection
 //        }
     }
 
-    public function get_one($sql, $param = null,$mode=\PDO::FETCH_ASSOC)
+    public function get_one($sql, $param = null, $mode = \PDO::FETCH_ASSOC)
     {
         $this->query($sql, $param);
         $this->sQuery->setFetchMode($mode);
         $result = $this->sQuery->fetch();
-        if($result){
+        if ($result) {
             return $result;
-        }else{
+        } else {
             return array();
         }
     }
 
-    public function get_all($sql, $param = null,$mode=\PDO::FETCH_ASSOC)
+    public function get_all($sql, $param = null, $mode = \PDO::FETCH_ASSOC)
     {
         $this->query($sql, $param);
         $this->sQuery->setFetchMode($mode);
         $result = $this->sQuery->fetchAll();
-        if($result){
+        if ($result) {
             return $result;
-        }else{
+        } else {
             return array();
         }
     }
@@ -260,11 +255,11 @@ class DbConnection
             . $this->having
             . $this->orderBy
             . $this->limit;
-       // echo $sql;
+        // echo $sql;
         return $sql;
     }
 
-    public function page($page = 1, $pageSize = 10,$mode=\PDO::FETCH_ASSOC)
+    public function page($page = 1, $pageSize = 10, $mode = \PDO::FETCH_ASSOC)
     {
         $sql = $this->buildSelect();
         $pageSql = "SELECT {$this->distinct} count(1) as num FROM {$this->table}"
@@ -275,8 +270,8 @@ class DbConnection
 //        echo $pageSql . '<br>';
         $row = $this->get_one($pageSql);
         $total = $row['num'];
-        $pageSize = empty($pageSize)?10:(int)$pageSize;
-        $page=(int)$page;
+        $pageSize = empty($pageSize) ? 10 : (int)$pageSize;
+        $page = (int)$page;
         if ($page > 0) {
             $index = $pageSize * ($page - 1);
         } else {
@@ -288,8 +283,8 @@ class DbConnection
             $page = 1;
         }
         $sql .= " limit {$index}, {$pageSize}";
- //       echo $sql;
-        $list = $this->get_all($sql,null,$mode);
+        //       echo $sql;
+        $list = $this->get_all($sql, null, $mode);
         global $pager;
         $pager->page = $page;
         $pager->epage = $pageSize;
@@ -354,16 +349,16 @@ class DbConnection
      */
     public function where($where)
     {
-        if(is_array($where)){
-            $str=" 1=1";
-            $params=array();
-            foreach($where as $field=>$v){
-                $str.=" and {$field}=:{$field}";
-                $params["{$field}"]=$v;
+        if (is_array($where)) {
+            $str = " 1=1";
+            $params = array();
+            foreach ($where as $field => $v) {
+                $str .= " and {$field}=:{$field}";
+                $params["{$field}"] = $v;
             }
-            $this->where=' where ' . $str;
+            $this->where = ' where ' . $str;
             $this->bindValues($params);
-        }else{
+        } else {
             $this->where = ' where ' . $where;
         }
         return $this;
@@ -396,12 +391,12 @@ class DbConnection
     public function bindValues($values = array())
     {
         //$this->bindValues = $arr;
-        if(is_array($values)){
+        if (is_array($values)) {
             foreach ($values as $key => $val) {
-                $this->bindValues[$key]=$val;
+                $this->bindValues[$key] = $val;
             }
-        }else{
-            array_push($this->bindValues,$values);
+        } else {
+            array_push($this->bindValues, $values);
         }
         return $this;
     }
@@ -412,18 +407,18 @@ class DbConnection
     }
 
     //取一行
-    public function row($mode=\PDO::FETCH_ASSOC)
+    public function row($mode = \PDO::FETCH_ASSOC)
     {
         $sql = $this->buildSelect() . " limit 1";
-        return $this->get_one($sql,null,$mode);
+        return $this->get_one($sql, null, $mode);
     }
 
     //取多行
-    public function all($mode=\PDO::FETCH_ASSOC)
+    public function all($mode = \PDO::FETCH_ASSOC)
     {
         $sql = $this->buildSelect();
         //echo $sql;
-        return $this->get_all($sql,null,$mode);
+        return $this->get_all($sql, null, $mode);
     }
 
     //取一行中一列的值
