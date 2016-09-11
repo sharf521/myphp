@@ -8,26 +8,11 @@
 
 namespace System\Lib;
 
-
-use Pimple\Container;
-
-/**
- * Class Application
- * @package System\Lib
- * @property \Pimple\Container $container
- */
 class Application
 {
-    private static $container=null;
+    private static $container=array();
     public static function getInstance($key)
     {
-        if(self::$container==null){
-            self::$container=new Container();
-        }
-//        self::$container[$key]=function($c){
-//            $app=new app();
-//            return $app;
-//        };
         if (!isset(self::$container[$key])) {
             self::$container[$key] = new $key;
         }
