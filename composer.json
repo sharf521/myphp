@@ -15,8 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "System\\": "src/",
-            "App\\": "app/"
+            "System\\": "src/"
         },
         "files": [
             "src/helpers.php"
