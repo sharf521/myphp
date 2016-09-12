@@ -10,16 +10,14 @@ class Controller
 
     public function __construct()
     {
-        //global $_G;
         $this->base_url = '/index.php/';
-        //$this->control	=$_G['class'];
-        //$this->func		=$_G['func'];
+        $this->control	=$GLOBALS['system']['class'];
+        $this->func		=$GLOBALS['system']['func'];
         $this->user_id = session('user_id');
         $this->username = session('username');
         $this->user_typeid = session('usertype');
         $this->dbfix = DB::dbfix();
-        //$_G['Controller'] = $this;
-        $GLOBALS['sys_baseUrl']=$this->base_url;
+        $GLOBALS['system']['Controller']=$this;
     }
 
     //显示模板
@@ -37,14 +35,9 @@ class Controller
         }
     }
 
-    public function base_url($control = '')
-    {
-        return $this->base_url . $control;
-    }
-
     public function anchor($control, $title = '', $attributes = '')
     {
-        $url = $this->base_url($control);
+        $url = $this->base_url . $control;
         if ($attributes != '') {
             if (is_array($attributes)) {
                 $str = '';
@@ -75,4 +68,3 @@ class Controller
         session()->flash_remove();
     }
 }
-
