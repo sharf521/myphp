@@ -381,10 +381,9 @@ function binary_to_file($file)
 //show_msg(array('不能为空','去百度','http://www.baidu.com','_blank'));
 function show_msg($msg = array())
 {
-    global $_G;
     echo '<!DOCTYPE html><html><head><meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>返回信息_' . $_G['system']['webname'] . '</title>
+	<title>返回信息：</title>
 	<style>
 	.backbox{ border:2px solid #ededed; padding:0px;width:320px;margin:0 auto}
 	.backbox h1{ font-size:18px; font-family:微软雅黑; background-color:#f5f4f4; padding-left:20px; font-weight:normal; line-height:38px; margin:4px}

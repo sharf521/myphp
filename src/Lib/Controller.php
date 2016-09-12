@@ -23,7 +23,6 @@ class Controller
     //显示模板
     public function view($tpl, $data = array())
     {
-        global $_G;//模板要用
         if (!empty($data)) {
             extract($data);
         }
