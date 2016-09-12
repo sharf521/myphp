@@ -9,11 +9,12 @@ class DB
     protected static $config;
 
     /**
+     * @param array $config
      * @return \System\Lib\DbConnection
      */
-    public static function instance($config = null)
+    public static function instance($config = array())
     {
-        if ($config == null) {
+        if ($config == array()) {
             $config = self::$config;
         } else {
             self::$config = $config;

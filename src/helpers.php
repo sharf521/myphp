@@ -2,9 +2,8 @@
 if (!function_exists('url')) {
     function url($path)
     {
-        global $_G;
         if (substr($path, 0, 1) != '/') {
-            $path = $_G['Controller']->base_url . $path;
+            $path = $GLOBALS['sys_baseUrl'] . $path;
         }
         return $path;
     }

@@ -41,11 +41,7 @@ class Redirect
         }elseif (strtolower(substr($this->path, 0, 7))=='http://' || strtolower(substr($this->path, 0, 8))=='https://'){
             $url = $this->path;
         }else{
-            global $_G;
-            $url = $this->path;
-            if (substr($this->path, 0, 1) != '/') {
-                $url = $_G['Controller']->base_url . $url;
-            }
+            $url = url($this->path);
         }
         header("location:$url");
         exit;

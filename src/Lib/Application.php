@@ -38,6 +38,7 @@ class Application
                 array_push($dependencies, null);
             }
         }
+        define("ACTION",$method);
         return call_user_func_array(array($class, $method), $dependencies);
     }
 }

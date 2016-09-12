@@ -10,15 +10,16 @@ class Controller
 
     public function __construct()
     {
-        global $_G;
+        //global $_G;
         $this->base_url = '/index.php/';
-        $this->control	=$_G['class'];
-        $this->func		=$_G['func'];
+        //$this->control	=$_G['class'];
+        //$this->func		=$_G['func'];
         $this->user_id = session('user_id');
         $this->username = session('username');
         $this->user_typeid = session('usertype');
         $this->dbfix = DB::dbfix();
-        $_G['Controller'] = $this;
+        //$_G['Controller'] = $this;
+        $GLOBALS['sys_baseUrl']=$this->base_url;
     }
 
     //显示模板
