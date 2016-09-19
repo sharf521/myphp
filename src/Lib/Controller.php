@@ -34,9 +34,14 @@ class Controller
         }
     }
 
+    private function base_url($path)
+    {
+        return $this->base_url . $path;
+    }
+
     public function anchor($control, $title = '', $attributes = '')
     {
-        $url = $this->base_url . $control;
+        $url = $this->base_url($control);
         if ($attributes != '') {
             if (is_array($attributes)) {
                 $str = '';
