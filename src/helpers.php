@@ -77,7 +77,7 @@ if (!function_exists('app')) {
         if (file_exists(ROOT . '/app/Model/' . ucfirst($className) . '.php')) {
             $className='\\app\\Model\\' . ucfirst($className);
         }
-        return \System\Lib\Application::getInstance($className);
+        return \System\Lib\Container::getInstance($className);
     }
 }
 
