@@ -9,7 +9,7 @@ class Application
         $request=app('\System\Lib\Request');
         $GLOBALS['system']['class']=($request->get(0) != '') ? $request->get(0) : 'index';
         $GLOBALS['system']['func']=($request->get(1) != '') ? $request->get(1) : 'index';
-        
+
         $_path='';
         foreach ($routes as $k=>$v){
             if ($GLOBALS['system']['class'] == $k) {
@@ -58,7 +58,7 @@ class Application
         foreach ($params as $param) {
             if ($param->getClass()) {
                 $_name = $param->getClass()->name;
-                array_push($dependencies, new $_name());
+                array_push($dependencies, app($_name));
             } elseif ($param->isDefaultValueAvailable()) {
                 array_push($dependencies, $param->getDefaultValue());
             } else {
