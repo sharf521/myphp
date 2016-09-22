@@ -24,11 +24,18 @@ if (!function_exists('url')) {
     function url($path)
     {
         if (substr($path, 0, 1) != '/') {
-            $path = $GLOBALS['_SYSTEM']['Controller']->base_url . $path;
+            $path = application('base_url') . $path;
         }
         return $path;
     }
 }
+if (!function_exists('application')) {
+    function application($param)
+    {
+        return \System\Lib\Application::$$param;
+    }
+}
+
 
 if (!function_exists('redirect')) {
     /**
@@ -537,4 +544,34 @@ function getCharFirst($s0)
     if ($asc >= -11847 and $asc <= -11056) return "Y";
     if ($asc >= -11055 and $asc <= -10247) return "Z";
     return null;
+}
+
+//输出提示框
+//show_msg(array('不能为空'));
+//show_msg(array('不能为空','去百度','http://www.baidu.com','_blank'));
+function show_msg($msg = array())
+{
+    global $_G;
+    echo '<!DOCTYPE html><html><head><meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>返回信息_' . $_G['system']['webname'] . '</title>
+	<style>
+	.backbox{ border:2px solid #ededed; padding:0px;width:320px;margin:0 auto}
+	.backbox h1{ font-size:18px; font-family:微软雅黑; background-color:#f5f4f4; padding-left:20px; font-weight:normal; line-height:38px; margin:4px}
+	.backbox li{list-style:none; text-align:center;font-size:14px; font-family:微软雅黑; line-height:32px;}
+	.backbox li a{ color:#015e8e;}
+	</style>
+	</head><body>';
+    $target = '';
+    $atxt = empty($msg[1]) ? "返回上一页" : $msg[1];
+    if (empty($msg[2])) $msg[2] = "javascript:history.go(-1);";
+    if (!empty($msg[3])) $target = "target=\"" . $msg[3] . "\"";
+    $url = "<a href=" . $msg[2] . " " . $target . ">" . $atxt . "</a>";
+    echo '
+	<ul class="backbox">
+		<h1>返回信息</h1>
+		<li>' . $msg[0] . '</li>
+		<li>' . $url . '</li>
+	</ul>
+	</body></html>';
 }

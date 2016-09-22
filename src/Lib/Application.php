@@ -4,55 +4,61 @@ namespace System\Lib;
 
 class Application
 {
+    public static $control;
+    public static $method;
+    public static $base_url;
     public static function start($routes=array())
     {
         $request=app('\System\Lib\Request');
-        $GLOBALS['_SYSTEM']['class']=($request->get(0) != '') ? $request->get(0) : 'index';
-        $GLOBALS['_SYSTEM']['func']=($request->get(1) != '') ? $request->get(1) : 'index';
-
+        self::$control=($request->get(0) != '') ? $request->get(0) : 'index';
+        self::$method=($request->get(1) != '') ? $request->get(1) : 'index';
+        $base_url="/index.php/";
         $_path='';
         foreach ($routes as $k=>$v){
-            if ($GLOBALS['_SYSTEM']['class'] == $k) {
+            if (self::$control == $k) {
                 $_path=$v;
+                $base_url="/index.php/{$k}/";
                 break;
             }
         }
         if($_path==''){
-            $GLOBALS['_SYSTEM']['houtai']=app('\App\Model\System')->getCode('houtai');
-            if ($GLOBALS['_SYSTEM']['class'] == $GLOBALS['_SYSTEM']['houtai']){
+            if (self::$control == app('\App\Model\System')->getCode('houtai')){
                 $_path='Admin';
+                $base_url="/index.php/".self::$control."/";
             }
         }
         if($_path==''){
-            if (file_exists(ROOT . '/app/Controller/' . ucfirst($GLOBALS['_SYSTEM']['class']) . 'Controller.php')) {
-                $_classpath = "\\App\\Controller\\" . ucfirst($GLOBALS['_SYSTEM']['class']) . "Controller";
-                $method = $GLOBALS['_SYSTEM']['func'];
+            if (file_exists(ROOT . '/app/Controller/' . ucfirst(self::$control) . 'Controller.php')) {
+                $_classpath = "\\App\\Controller\\" . ucfirst(self::$control) . "Controller";
+                $method = self::$method;
             } else {
                 $_classpath='\App\Controller\IndexController';
-                $method = $GLOBALS['_SYSTEM']['class'];
+                $method = self::$control;
             }
         }else{
-            $GLOBALS['_SYSTEM']['class']=($request->get(1) != '') ? $request->get(1) : 'index';
-            $GLOBALS['_SYSTEM']['func']=($request->get(2) != '') ? $request->get(2) : 'index';
-
-            if (file_exists(ROOT . '/app/Controller/'.$_path.'/' . ucfirst($GLOBALS['_SYSTEM']['class']) . 'Controller.php')) {
-                $_classpath = "\\App\\Controller\\" .$_path.'\\'. ucfirst($GLOBALS['_SYSTEM']['class']) . "Controller";
-                $method = $GLOBALS['_SYSTEM']['func'];
+            self::$control=($request->get(1) != '') ? $request->get(1) : 'index';
+            self::$method=($request->get(2) != '') ? $request->get(2) : 'index';
+            if (file_exists(ROOT . '/app/Controller/'.$_path.'/' . ucfirst(self::$control) . 'Controller.php')) {
+                $_classpath = "\\App\\Controller\\" .$_path.'\\'. ucfirst(self::$control) . "Controller";
+                $method = self::$method;
             } else {
                 $_classpath = "\\App\\Controller\\" .$_path."\\IndexController";
-                $method = $GLOBALS['_SYSTEM']['class'];
+                $method = self::$control;
             }
         }
-        return self::starting($_classpath,$method);
+        self::$base_url=$base_url;//构造方法执行不完整时需要
+        $class=new $_classpath();
+        $class->control=self::$control;
+        $class->func=self::$method;
+        return self::starting($class,$method);
     }
 
-    public static function starting($control,$method='index')
+    public static function starting($class,$method='index')
     {
-        $class=new $control();
         if (!method_exists($class, $method)) {
             $method = 'error';
         }
-        $rMethod = new \ReflectionMethod($control, $method);
+        $rMethod = new \ReflectionMethod($class, $method);
         $params = $rMethod->getParameters();
         $dependencies = array();
         foreach ($params as $param) {

@@ -2,5 +2,5 @@ my doing....
 
 test11
 
-$GLOBALS['system']==>$GLOBALS['_SYSTEM']
+移除 $GLOBALS['system']
 ACTION===>APP_ACTION

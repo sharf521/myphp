@@ -7,15 +7,17 @@ class Request
     {
         //index.php/class/func
         $_path=$_SERVER['PATH_INFO'];
-        $arr=explode("/",trim($_path,'/'));
-        //index.php/class/func/a/1/b/2  --> $_GET[a]=1 $_GET[b]=2
-        foreach ($arr as $i => $v) {
-            $v = strip_tags(trim($v));
-            $_GET[$i] = $v;
-            //index.php/class/func/a/1/b/2
-            //a和b位置 不能为数字
-            if ($i > 1 && $i % 2 == 0 && !is_numeric($v)) {
-                $_GET[$arr[$i]] =$this->safe_str($arr[$i + 1]);
+        if($_path!=='PATH_INFO'){
+            $arr=explode("/",trim($_path,'/'));
+            //index.php/class/func/a/1/b/2  --> $_GET[a]=1 $_GET[b]=2
+            foreach ($arr as $i => $v) {
+                $v = strip_tags(trim($v));
+                $_GET[$i] = $v;
+                //index.php/class/func/a/1/b/2
+                //a和b位置 不能为数字
+                if ($i > 1 && $i % 2 == 0 && !is_numeric($v)) {
+                    $_GET[$arr[$i]] =$this->safe_str($arr[$i + 1]);
+                }
             }
         }
     }

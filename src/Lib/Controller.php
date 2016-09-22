@@ -3,21 +3,16 @@ namespace System\Lib;
 
 class Controller
 {
-    public $base_url;
     public $template;
     public $user_id;
     public $username;
 
     public function __construct()
     {
-        $this->base_url = '/index.php/';
-        $this->control	=$GLOBALS['_SYSTEM']['class'];
-        $this->func		=$GLOBALS['_SYSTEM']['func'];
         $this->user_id = session('user_id');
         $this->username = session('username');
         $this->user_typeid = session('usertype');
         $this->dbfix = DB::dbfix();
-        $GLOBALS['_SYSTEM']['Controller']=$this;
     }
 
     //显示模板
@@ -34,9 +29,9 @@ class Controller
         }
     }
 
-    private function base_url($path)
+    public function base_url($path)
     {
-        return $this->base_url . $path;
+        return application('base_url') . $path;
     }
 
     public function anchor($control, $title = '', $attributes = '')
