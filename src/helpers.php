@@ -387,59 +387,6 @@ function curl_url($url, $data = array())
     return $data;
 }
 
-function binary_to_file($file)
-{
-    $content = "";
-    if (empty($content)) {
-        $content = file_get_contents('php://input');
-    }
-    $ret = file_put_contents($file, $content, true);
-    return $ret;
-}
-
-//输出提示框
-//show_msg(array('不能为空'));
-//show_msg(array('不能为空','去百度','http://www.baidu.com','_blank'));
-function show_msg($msg = array())
-{
-    echo '<!DOCTYPE html><html><head><meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>返回信息：</title>
-	<style>
-	.backbox{ border:2px solid #ededed; padding:0px;width:320px;margin:0 auto}
-	.backbox h1{ font-size:18px; font-family:微软雅黑; background-color:#f5f4f4; padding-left:20px; font-weight:normal; line-height:38px; margin:4px}
-	.backbox li{list-style:none; text-align:center;font-size:14px; font-family:微软雅黑; line-height:32px;}
-	.backbox li a{ color:#015e8e;}
-	</style>
-	</head><body>';
-    $target = '';
-    $atxt = empty($msg[1]) ? "返回上一页" : $msg[1];
-    if (empty($msg[2])) $msg[2] = "javascript:history.go(-1);";
-    if (!empty($msg[3])) $target = "target=\"" . $msg[3] . "\"";
-    $url = "<a href=" . $msg[2] . " " . $target . ">" . $atxt . "</a>";
-    echo '
-	<ul class="backbox">
-		<h1>返回信息</h1>
-		<li>' . $msg[0] . '</li>
-		<li>' . $url . '</li>
-	</ul>
-	</body></html>';
-}
-
-/**************************************************************
- *
- *    将数组转换为JSON字符串（兼容中文）
- * @param  array $array 要转换的数组
- * @return string      转换得到的json字符串
- * @access public
- *
- *************************************************************/
-function JSON($array)
-{
-    arrayRecursive($array, 'urlencode', true);
-    $json = json_encode($array);
-    return urldecode($json);
-}
 
 //此函数完成带汉字的字符串取串
 function substr_cn($str, $mylen)
@@ -460,81 +407,6 @@ function substr_cn($str, $mylen)
     }
     return $content;
 }
-
-
-
-
-
-
-/**
- * utf8转gbk
- * @param $utfstr
- */
-function utf8_to_gbk($utfstr)
-{
-    global $UC2GBTABLE;
-    $okstr = '';
-    if (empty($UC2GBTABLE)) {
-        $filename = ROOT . 'core/encoding/gb-unicode.table';
-        $fp = fopen($filename, 'rb');
-        while ($l = fgets($fp, 15)) {
-            $UC2GBTABLE[hexdec(substr($l, 7, 6))] = hexdec(substr($l, 0, 6));
-        }
-        fclose($fp);
-    }
-    $okstr = '';
-    $ulen = strlen($utfstr);
-    for ($i = 0; $i < $ulen; $i++) {
-        $c = $utfstr[$i];
-        $cb = decbin(ord($utfstr[$i]));
-        if (strlen($cb) == 8) {
-            $csize = strpos(decbin(ord($cb)), '0');
-            for ($j = 0; $j < $csize; $j++) {
-                $i++;
-                $c .= $utfstr[$i];
-            }
-            $c = utf8_to_unicode($c);
-            if (isset($UC2GBTABLE[$c])) {
-                $c = dechex($UC2GBTABLE[$c] + 0x8080);
-                $okstr .= chr(hexdec($c[0] . $c[1])) . chr(hexdec($c[2] . $c[3]));
-            } else {
-                $okstr .= '&#' . $c . ';';
-            }
-        } else {
-            $okstr .= $c;
-        }
-    }
-    $okstr = trim($okstr);
-    return $okstr;
-}
-
-/**
- * utf8转unicode
- * @param  $c
- */
-function utf8_to_unicode($c)
-{
-    switch (strlen($c)) {
-        case 1:
-            return ord($c);
-        case 2:
-            $n = (ord($c[0]) & 0x3f) << 6;
-            $n += ord($c[1]) & 0x3f;
-            return $n;
-        case 3:
-            $n = (ord($c[0]) & 0x1f) << 12;
-            $n += (ord($c[1]) & 0x3f) << 6;
-            $n += ord($c[2]) & 0x3f;
-            return $n;
-        case 4:
-            $n = (ord($c[0]) & 0x0f) << 18;
-            $n += (ord($c[1]) & 0x3f) << 12;
-            $n += (ord($c[2]) & 0x3f) << 6;
-            $n += ord($c[3]) & 0x3f;
-            return $n;
-    }
-}
-
 
 //导出excel格式表
 function excel($filename, $title, $data)
@@ -622,7 +494,7 @@ function DeCode($string, $operation, $key = 'cgqhcYpp')
 
 
 //返回首字母
-function getcharacter($s0)
+function getCharFirst($s0)
 {
     $fchar = ord($s0{0});
     if ($fchar >= ord("A") and $fchar <= ord("z")) return strtoupper($s0{0});
@@ -659,57 +531,4 @@ function getcharacter($s0)
     if ($asc >= -11847 and $asc <= -11056) return "Y";
     if ($asc >= -11055 and $asc <= -10247) return "Z";
     return null;
-}
-
-function ueditor($data=array())
-{
-    $name=isset($data['name'])?$data['name']:'content';
-    $value=isset($data['value'])?$data['value']:'';
-    ?>
-
-    <!-- 加载编辑器的容器 -->
-    <script id="container" name="<?=$name?>" type="text/plain" style="width:900px;">
-        <?=$value?>
-    </script>
-    <!-- 配置文件 -->
-    <script type="text/javascript" src="/plugin/ueditor/ueditor.config.js"></script>
-    <!-- 编辑器源码文件 -->
-    <script type="text/javascript" src="/plugin/ueditor/ueditor.all.js"></script>
-    <!-- 实例化编辑器 -->
-    <script type="text/javascript">
-        var ue = UE.getEditor('container', {
-            /*toolbars: [
-             ['fullscreen', 'source', 'undo', 'redo', 'bold']
-             ],*/
-            autoHeightEnabled: true,
-            autoFloatEnabled: true
-        });
-    </script>
-    <?
-}
-function ueditor_shop($data=array())
-{
-    $name=isset($data['name'])?$data['name']:'content';
-    $value=isset($data['value'])?$data['value']:'';
-    ?>
-
-    <!-- 加载编辑器的容器 -->
-    <script id="container" name="<?=$name?>" type="text/plain" style="width:758px;">
-        <?=$value?>
-    </script>
-    <!-- 配置文件 -->
-    <script type="text/javascript" src="/plugin/ueditor/ueditor.config.js"></script>
-    <!-- 编辑器源码文件 -->
-    <script type="text/javascript" src="/plugin/ueditor/ueditor.all.js"></script>
-    <!-- 实例化编辑器 -->
-    <script type="text/javascript">
-        var ue = UE.getEditor('container', {
-            /*toolbars: [
-             ['fullscreen', 'source', 'undo', 'redo', 'bold']
-             ],*/
-            autoHeightEnabled: true,
-            autoFloatEnabled: true
-        });
-    </script>
-    <?
 }

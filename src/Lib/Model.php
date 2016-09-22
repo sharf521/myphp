@@ -198,7 +198,7 @@ class Model
 
     public function select($str)
     {
-        DB::where($str);
+        DB::select($str);
         return $this;
     }
 
