@@ -11,13 +11,13 @@ class Controller
     public function __construct()
     {
         $this->base_url = '/index.php/';
-        $this->control	=$GLOBALS['system']['class'];
-        $this->func		=$GLOBALS['system']['func'];
+        $this->control	=$GLOBALS['_SYSTEM']['class'];
+        $this->func		=$GLOBALS['_SYSTEM']['func'];
         $this->user_id = session('user_id');
         $this->username = session('username');
         $this->user_typeid = session('usertype');
         $this->dbfix = DB::dbfix();
-        $GLOBALS['system']['Controller']=$this;
+        $GLOBALS['_SYSTEM']['Controller']=$this;
     }
 
     //显示模板

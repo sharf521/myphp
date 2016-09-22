@@ -2,4 +2,5 @@ my doing....
 
 test11
 
-as
+$GLOBALS['system']==>$GLOBALS['_SYSTEM']
+ACTION===>APP_ACTION

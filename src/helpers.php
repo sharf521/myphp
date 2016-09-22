@@ -24,7 +24,7 @@ if (!function_exists('url')) {
     function url($path)
     {
         if (substr($path, 0, 1) != '/') {
-            $path = $GLOBALS['system']['Controller']->base_url . $path;
+            $path = $GLOBALS['_SYSTEM']['Controller']->base_url . $path;
         }
         return $path;
     }
@@ -452,9 +452,15 @@ function qrcode($data, $dir, $filename, $level = 'L', $size = 4, $marg = 0, $col
     return $filename;
 }
 
-//DeCode(密文,'D',密钥); 解密
-//DeCode(明文,'E',密钥); 加密
-function DeCode($string, $operation, $key = 'cgqhcYpp')
+/**
+ * 加密:(明文,'E',密钥);
+ * 解密:(密文,'D',密钥);
+ * @param $string
+ * @param string $operation
+ * @param string $key
+ * @return mixed|string
+ */
+function DeCode($string, $operation='D|E', $key = 'cgqhcYpp')
 {
     $key = md5($key);
     $key_length = strlen($key);
