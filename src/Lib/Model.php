@@ -189,7 +189,18 @@ class Model
         }
     }
 ///////以下DB类方法/////////////////////////////////////////////////////////////////////////////////
-
+    public function update($array)
+    {
+        return DB::table($this->table)->update($array);
+    }
+    public function insert($array)
+    {
+        return DB::table($this->table)->insert($array);
+    }
+    public function insertGetId($array)
+    {
+        return DB::table($this->table)->insertGetId($array);
+    }
     //取一行中一列的值
     public function value($col = 'id', $type = 'int|float')
     {
