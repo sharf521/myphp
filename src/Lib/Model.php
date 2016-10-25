@@ -214,6 +214,11 @@ class Model
     {
         return DB::table($this->table)->value($col, $type);
     }
+    
+    public function lists($col, $key = null)
+    {
+        return DB::table($this->table)->lists($col,$key);
+    }
 
     public function select($str)
     {
