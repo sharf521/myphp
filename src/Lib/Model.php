@@ -90,9 +90,17 @@ class Model
         return app($class)->where("{$foreign_key}='{$this->$local_key}'")->first();
     }
 
-    public function hasMany($class, $foreign_key, $local_key = 'id')
+    public function hasMany($class, $foreign_key, $local_key = 'id',$where='',$orderby='')
     {
-        return app($class)->where("{$foreign_key}='{$this->$local_key}'")->get();
+        $whe="{$foreign_key}='{$this->$local_key}'";
+        if($where!=''){
+            $whe.=" and ".$where;
+        }
+        $order=$foreign_key;
+        if($orderby!=''){
+            $order=$orderby;
+        }
+        return app($class)->where($whe)->orderBy($order)->get();
     }
 
     //获取联动值
