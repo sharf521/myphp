@@ -185,7 +185,7 @@ class Model
         if ($this->is_exist) {
             $primaryKey = $this->primaryKey;
             $id = $this->$primaryKey;
-            unset($this->attributes[$this->$primaryKey]);
+            unset($this->attributes[$this->primaryKey]);
             return DB::table($this->table)->where("{$primaryKey}=?")->bindValues($id)->limit('1')->update($this->attributes);
         } else {
             $this->attributes['created_at']=time();
