@@ -145,26 +145,35 @@ class Model
     }
 
     /**
-     * 获取一个对象
-     * @return $this
+     * @param bool $returnObj
+     * @return $this|array|Model
      */
-    public function first()
+    public function first($returnObj=true)
     {
-        $obj = DB::table($this->table)->row(\PDO::FETCH_OBJ);
-        return $this->setObj($obj);
+        if($returnObj){
+            $obj = DB::table($this->table)->row(\PDO::FETCH_OBJ);
+            return $this->setObj($obj);
+        }else{
+            return DB::table($this->table)->row();
+        }
     }
 
     /**
-     * 返回一个数组，每个元素是一个对象
+     * 返回一个数组，默认每个元素是一个对象
+     * @param bool $returnObj
      * @return array
      */
-    public function get()
+    public function get($returnObj=true)
     {
-        $result = DB::table($this->table)->all(\PDO::FETCH_OBJ);
-        foreach ($result as $i => $v) {
-            $result[$i] = $this->setObj($v);
+        if($returnObj){
+            $result = DB::table($this->table)->all(\PDO::FETCH_OBJ);
+            foreach ($result as $i => $v) {
+                $result[$i] = $this->setObj($v);
+            }
+            return $result;
+        }else{
+            return  DB::table($this->table)->all();
         }
-        return $result;
     }
 
     public function pager($page = 1, $pageSize = 10)

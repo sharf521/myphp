@@ -6,22 +6,17 @@ class Request
     private $data=array();
     function __construct()
     {
-        //index.php/class/func
-        $_path=$_SERVER['PATH_INFO'];
+        $_path=$_SERVER['PATH_INFO']; //index.php/class/func
         if($_path!=='PATH_INFO'){
             $arr=explode("/",trim($_path,'/'));
-            //index.php/class/func/a/1/b/2  --> $_GET[a]=1 $_GET[b]=2
             $this->data=$_GET;
             foreach ($arr as $i => $v) {
                 $v = strip_tags(trim($v));
-                //$_GET[$i] = $v;
                 $this->data[$i]=$v;
-                //index.php/class/func/a/1/b/2
-                //a和b位置 不能为数字
-                if ($i > 1 && $i % 2 == 0 && !is_numeric($v)) {
-                    //$_GET[$arr[$i]] =$this->safe_str($arr[$i + 1]);
-                    $this->data[$arr[$i]] =$this->safe_str($arr[$i + 1]);
-                }
+                //index.php/class/func/a/1/b/2  a和b位置 不能为数字
+//                if ($i > 1 && $i % 2 == 0 && !is_numeric($v)) {
+//                    $this->data[$arr[$i]] =$this->safe_str($arr[$i + 1]);
+//                }
             }
         }
     }
