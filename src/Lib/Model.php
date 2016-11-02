@@ -145,34 +145,34 @@ class Model
     }
 
     /**
-     * @param bool $returnObj
+     * @param bool $returnArr
      * @return $this|array|Model
      */
-    public function first($returnObj=true)
+    public function first($returnArr=false)
     {
-        if($returnObj){
+        if($returnArr){
+            return DB::table($this->table)->row();
+        }else{
             $obj = DB::table($this->table)->row(\PDO::FETCH_OBJ);
             return $this->setObj($obj);
-        }else{
-            return DB::table($this->table)->row();
         }
     }
 
     /**
      * 返回一个数组，默认每个元素是一个对象
-     * @param bool $returnObj
+     * @param bool $returnArr
      * @return array
      */
-    public function get($returnObj=true)
+    public function get($returnArr=false)
     {
-        if($returnObj){
+        if($returnArr){
+            return  DB::table($this->table)->all();
+        }else{
             $result = DB::table($this->table)->all(\PDO::FETCH_OBJ);
             foreach ($result as $i => $v) {
                 $result[$i] = $this->setObj($v);
             }
             return $result;
-        }else{
-            return  DB::table($this->table)->all();
         }
     }
 
