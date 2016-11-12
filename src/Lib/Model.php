@@ -112,12 +112,20 @@ class Model
 
 ///////////////////////////////////////////////////////////
 
+    /**
+     * @param $id
+     * @return $this
+     */
     public function find($id)
     {
         $this->attributes[$this->primaryKey] = $id;
         return $this->where($this->primaryKey . "=?")->bindValues($id)->first();
     }
 
+    /**
+     * @param $id
+     * @return $this
+     */
     public function findOrFail($id)
     {
         $obj = $this->find($id);
