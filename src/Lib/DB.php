@@ -130,18 +130,24 @@ class DbConnection
 //        echo $query . '<br>';
 //        print_r($params);
 //        echo '<br>';
-        $this->sQuery = $this->pdo->prepare($query);
-        if (is_array($params)) {
-            foreach ($params as $k => &$v) {
-                if (is_string($k)) {
-                    $this->sQuery->bindParam(':' . $k, $v);
-                } else {
-                    $this->sQuery->bindParam($k + 1, $v);
+        try{
+            $this->sQuery = $this->pdo->prepare($query);
+            if (is_array($params)) {
+                foreach ($params as $k => &$v) {
+                    if (is_string($k)) {
+                        $this->sQuery->bindParam(':' . $k, $v);
+                    } else {
+                        $this->sQuery->bindParam($k + 1, $v);
+                    }
                 }
             }
+            $this->reset();
+            return $this->sQuery->execute();
+        }catch(\Exception $e){
+            $this->error_msg("{$query}".json_encode($params));
+            echo $e->getMessage();
+            throw $e;
         }
-        $this->reset();
-        return $this->sQuery->execute();
 //        $rawStatement = explode(" ", trim($query));
 //        $statement = strtolower($rawStatement[0]);
 //        if ($statement === 'select' || $statement === 'show') {
@@ -153,6 +159,22 @@ class DbConnection
 //                return $this->pdo->lastInsertId();
 //            }
 //        }
+    }
+
+    private function error_msg($msg)
+    {
+        $file_path = ROOT . "/public/data/logs/";
+        if (!is_dir($file_path)) {
+            mkdir($file_path, 0777, true);
+        }
+        $filename = $file_path . date("Ym") . ".log";
+        $fp = fopen($filename, "a+");
+        $time = date('Y-m-d H:i:s');
+        $ip=$this->ip();
+        $file = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
+        $str = "time:{$time}\t ip:{$ip}}\t{error:" . $msg . "}\t file:{$file}\t\r\n";
+        fputs($fp, $str);
+        fclose($fp);
     }
 
     public function get_one($sql, $param = null, $mode = \PDO::FETCH_ASSOC)
@@ -197,25 +219,6 @@ class DbConnection
         if ($this->pdo->inTransaction()) {
             $this->pdo->rollBack();
         }
-    }
-
-    function error_msg($msg)
-    {
-        $mysql_dir = 'data';
-        $dtime = date("Y-m-d", time());
-        $ip = ip();
-        $file = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
-        if (!file_exists($mysql_dir . "/mysql_error")) {
-            mkdir($mysql_dir . "/mysql_error", 0777);
-        }
-        $fp = @fopen($mysql_dir . "/mysql_error/" . $dtime . ".log", "a+");
-        $time = date("H:i:s");
-        //debug_print_backtrace();
-        $str = "{time:$time}\t{ip:" . $ip . "}\t{error:" . $msg . "}\t{file:" . $file . "}\t\r\n";
-        @fputs($fp, $str);
-        @fclose($fp);
-        echo $str;
-        return false;
     }
 
     //禁止克隆
@@ -502,6 +505,20 @@ class DbConnection
     {
         $this->insert($data);
         return $this->pdo->lastInsertId();
+    }
+
+    private function ip()
+    {
+        if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
+            $ip_address = $_SERVER["HTTP_CLIENT_IP"];
+        } else if (!empty($_SERVER["HTTP_X_FORWARDED_FOR"])) {
+            $ip_address = array_pop(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']));
+        } else if (!empty($_SERVER["REMOTE_ADDR"])) {
+            $ip_address = $_SERVER["REMOTE_ADDR"];
+        } else {
+            $ip_address = '';
+        }
+        return $ip_address;
     }
 }
 
