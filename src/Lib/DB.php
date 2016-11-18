@@ -271,8 +271,9 @@ class DbConnection
             . $this->where
             . $this->groupBy
             . $this->having;
-//        echo $pageSql . '<br>';
+        $params = $this->bindValues;
         $row = $this->get_one($pageSql);
+        $this->bindValues=$params;
         $total = $row['num'];
         $pageSize = empty($pageSize) ? 10 : (int)$pageSize;
         $page = (int)$page;
@@ -287,7 +288,6 @@ class DbConnection
             $page = 1;
         }
         $sql .= " limit {$index}, {$pageSize}";
-        //       echo $sql;
         $list = $this->get_all($sql, null, $mode);
         global $pager;
         $pager->page = $page;
@@ -394,7 +394,6 @@ class DbConnection
 
     public function bindValues($values = array())
     {
-        //$this->bindValues = $arr;
         if (is_array($values)) {
             foreach ($values as $key => $val) {
                 $this->bindValues[$key] = $val;
