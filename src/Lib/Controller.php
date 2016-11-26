@@ -13,6 +13,7 @@ class Controller
         $this->username = session('username');
         $this->user_typeid = session('usertype');
         $this->dbfix = DB::dbfix();
+        $this->self_url=urlencode($_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
     }
 
     //显示模板
