@@ -12,19 +12,19 @@ class Application
         $request=app('\System\Lib\Request');
         self::$control=($request->get(0) != '') ? $request->get(0) : 'index';
         self::$method=($request->get(1) != '') ? $request->get(1) : 'index';
-        $base_url="/index.php/";
+        $base_url="/";
         $_path='';
         foreach ($routes as $k=>$v){
             if (self::$control == $k) {
                 $_path=$v;
-                $base_url="/index.php/{$k}/";
+                $base_url="/{$k}/";
                 break;
             }
         }
         if($_path==''){
             if (self::$control == app('\App\Model\System')->getCode('houtai')){
                 $_path='Admin';
-                $base_url="/index.php/".self::$control."/";
+                $base_url="/".self::$control."/";
             }
         }
         if($_path==''){
