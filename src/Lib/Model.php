@@ -29,7 +29,7 @@ class Model
                 $val=null;
             }
         }
-        if(in_array($key,$this->dates)){
+        if(in_array($key,$this->dates) && $val!=0){
             return date('Y-m-d H:i:s',$val);
         }else{
             return $val;
