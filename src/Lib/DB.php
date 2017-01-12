@@ -472,7 +472,8 @@ class DbConnection
     public function delete()
     {
         $sql = "DELETE FROM {$this->table}" . $this->where . $this->limit;
-        return $this->query($sql);
+        $this->query($sql);
+        return $this->sQuery->rowCount();
     }
 
     public function update($data = array())
@@ -484,7 +485,8 @@ class DbConnection
         $value = implode(',', $_sql);
         $sql = "UPDATE " . $this->table . " SET $value " . $this->where . $this->limit;
 //        echo $sql;
-        return $this->query($sql);
+        $this->query($sql);
+        return $this->sQuery->rowCount();
     }
 
     public function insert($data = array())
@@ -497,7 +499,8 @@ class DbConnection
         $field = substr($field, 0, -1);
         $value = substr($value, 0, -1);
         $sql = "INSERT INTO " . $this->table . " ($field) VALUES ($value)";
-        return $this->query($sql);
+        $this->query($sql);
+        return $this->sQuery->rowCount();
     }
 
     public function insertGetId($data = array())
