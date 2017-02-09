@@ -28,12 +28,22 @@ class Application
             }
         }
         if($_path==''){
-            if (file_exists(ROOT . '/app/Controller/' . ucfirst(self::$control) . 'Controller.php')) {
-                $_classpath = "\\App\\Controller\\" . ucfirst(self::$control) . "Controller";
-                $method = self::$method;
-            } else {
-                $_classpath='\App\Controller\IndexController';
-                $method = self::$control;
+            if(file_exists(ROOT . '/app/Controller/Home') && is_dir(ROOT . '/app/Controller/Home')){
+                if (file_exists(ROOT . '/app/Controller/Home/' . ucfirst(self::$control) . 'Controller.php')) {
+                    $_classpath = "\\App\\Controller\\Home\\" . ucfirst(self::$control) . "Controller";
+                    $method = self::$method;
+                } else {
+                    $_classpath='\App\Controller\Home\IndexController';
+                    $method = self::$control;
+                }
+            }else{
+                if (file_exists(ROOT . '/app/Controller/' . ucfirst(self::$control) . 'Controller.php')) {
+                    $_classpath = "\\App\\Controller\\" . ucfirst(self::$control) . "Controller";
+                    $method = self::$method;
+                } else {
+                    $_classpath='\App\Controller\IndexController';
+                    $method = self::$control;
+                }
             }
         }else{
             self::$control=($request->get(1) != '') ? $request->get(1) : 'index';
@@ -48,8 +58,8 @@ class Application
         }
         self::$base_url=$base_url;//构造方法执行不完整时需要
         $class=new $_classpath();
-        $class->control=self::$control;
-        $class->func=self::$method;
+        //$class->control=self::$control;
+        //$class->func=self::$method;
         return self::starting($class,$method);
     }
 
