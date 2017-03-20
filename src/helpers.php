@@ -19,6 +19,16 @@ if (!function_exists('myErrorHandler')) {
     set_error_handler('myErrorHandler');
 }
 
+if(!function_exists('myExceptionHandler')){
+    function myExceptionHandler($e){
+        $error= "<b>Exception：</b>" . $e->getMessage();
+        redirect()->back()->with('error',$error);
+        echo $error;
+        exit;
+    }
+    set_exception_handler('myExceptionHandler');
+}
+
 if (!function_exists('url')) {
     function url($path)
     {
