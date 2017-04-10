@@ -33,7 +33,7 @@ if (!function_exists('url')) {
     function url($path)
     {
         $_str=strtolower(substr($path,0,8));
-        if (substr($path, 0, 1) != '/' && $_str!='https://' && substr($_str,0,7)!='http://') {
+        if (substr($_str, 0, 1) != '/' && $_str!='https://' && substr($_str,0,7)!='http://') {
             $path = application('base_url') . $path;
         }
         return $path;
