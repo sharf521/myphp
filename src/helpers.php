@@ -32,12 +32,14 @@ if(!function_exists('myExceptionHandler')){
 if (!function_exists('url')) {
     function url($path)
     {
-        if (substr($path, 0, 1) != '/') {
+        $_str=strtolower(substr($path,0,8));
+        if (substr($path, 0, 1) != '/' && $_str!='https://' && substr($_str,0,7)!='http://') {
             $path = application('base_url') . $path;
         }
         return $path;
     }
 }
+
 if (!function_exists('application')) {
     function application($param)
     {
