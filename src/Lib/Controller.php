@@ -4,8 +4,6 @@ namespace System\Lib;
 class Controller
 {
     public $template;
-    public $user_id;
-    public $username;
 
     public function __construct()
     {
