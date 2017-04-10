@@ -9,9 +9,9 @@ class Controller
 
     public function __construct()
     {
-        $this->user_id = session('user_id');
+/*        $this->user_id = session('user_id');
         $this->username = session('username');
-        $this->user_typeid = session('usertype');
+        $this->user_typeid = session('usertype');*/
         $this->dbfix = DB::dbfix();
         $this->control	=application('control');
         $this->func	=application('method');
