@@ -22,7 +22,7 @@ if (!function_exists('myErrorHandler')) {
 if(!function_exists('myExceptionHandler')){
     function myExceptionHandler($e){
         $error= "<b>Exception：</b>" . $e->getMessage();
-        redirect()->back()->with('error',$error);
+        //redirect()->back()->with('error',$error);
         echo $error;
         exit;
     }
