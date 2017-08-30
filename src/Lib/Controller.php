@@ -60,7 +60,12 @@ class Controller
 
     public function error()
     {
-        echo 'not find page';
+        $file='404.php';
+        if(file_exists($file)){
+            echo file_get_contents($file);
+        }else{
+            echo '404 error not find page';
+        }
     }
 
     public function __destruct()

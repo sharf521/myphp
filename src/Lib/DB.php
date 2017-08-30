@@ -554,17 +554,14 @@ $list=DB::table('user_test')->where('id>2')->lists('name','id');
 print_r($list);
 
 
-try {
-            $this->mysql->beginTransaction();
-
-,........
-
-            $this->mysql->commit();
-        } catch (Exception $e) {
-            $this->mysql->rollBack();
+        try {
+            DB::beginTransaction();
+            $this->calFbbDo();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
             echo "Failed: " . $e->getMessage();
             return false;
         }
-        return true;
 
 */
