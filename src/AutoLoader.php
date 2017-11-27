@@ -14,7 +14,6 @@ class AutoLoader
             $class_path=implode(DIRECTORY_SEPARATOR,$arr);
             $class_file = __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . "$class_path.php";
         }
-        //echo $class_file.'<br><br><br>';
         if (is_file($class_file)) {
             include_once $class_file;
         }

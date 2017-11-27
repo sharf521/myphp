@@ -82,14 +82,6 @@ if (!function_exists('app')) {
      * @param $className
      * @return mixed
      */
-//    function app($className)
-//    {
-//        if (file_exists(ROOT . '/app/Model/' . ucfirst($className) . '.php')) {
-//            $className='\\app\\Model\\' . ucfirst($className);
-//        }
-//        return \System\Lib\App::getInstance($className);
-//    }
-
     function app($className)
     {
         if (file_exists(ROOT . '/app/Model/' . ucfirst($className) . '.php')) {
