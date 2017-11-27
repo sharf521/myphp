@@ -7,9 +7,6 @@ class Controller
 
     public function __construct()
     {
-/*        $this->user_id = session('user_id');
-        $this->username = session('username');
-        $this->user_typeid = session('usertype');*/
         $this->dbfix = DB::dbfix();
         $this->control	=application('control');
         $this->func	=application('method');
@@ -17,16 +14,16 @@ class Controller
     }
 
     //显示模板
-    public function view($tpl, $data = array())
+    public function view($sysTplFileName, $data = array())
     {
         if (!empty($data)) {
             extract($data);
         }
-        $file = ROOT . '/app/themes/' . $this->template . '/' . $tpl . '.tpl.php';
-        if (file_exists($file)) {
-            require($file);
+        $sysFilePath = ROOT . '/app/themes/' . $this->template . '/' . $sysTplFileName . '.tpl.php';
+        if (file_exists($sysFilePath)) {
+            require($sysFilePath);
         } else {
-            echo 'Error:no file ' . $this->template . '/' . $tpl . '.tpl.php';
+            echo 'Error:no file ' . $this->template . '/' . $sysTplFileName . '.tpl.php';
         }
     }
 
