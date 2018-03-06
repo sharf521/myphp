@@ -56,7 +56,7 @@ class Page
                 $multipage .= $i == $curpage ? '<span class="p_curpage">' . $i . '</span>' : '<a href="' . $mpurl . 'page=' . $i . '" class="p_num">' . $i . '</a>';
             }
             $multipage .= ($curpage < $pages ? '<a href="' . $mpurl . 'page=' . ($curpage + 1) . '" class="p_redirect" title="下一页">&#8250;</a>' : '') . ($to < $pages ? '<a href="' . $mpurl . 'page=' . $pages . '" class="p_redirect" title="尾页">&raquo;</a>' : '');
-            $multipage = $multipage ? '<div class="p_bar"><span class="p_info">总' . $num . '条</span>' . $multipage . '</div>' : '';
+            $multipage = $multipage ? '<div class="p_bar"><span class="p_info">总<i>'. $num . '</i>条</span>' . $multipage . '</div>' : '';
         }
         return $multipage;
     }
