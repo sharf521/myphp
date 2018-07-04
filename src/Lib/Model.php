@@ -109,7 +109,11 @@ class Model
     public function getLinkPageName($code, $codeKey)
     {
         $result = app('\App\Model\LinkPage')->getLinkPage();
-        return $result[$code][$codeKey];
+        if(isset($result[$code][$codeKey])){
+            return $result[$code][$codeKey];
+        }else{
+            return $codeKey;
+        }
     }
 
 ///////////////////////////////////////////////////////////
