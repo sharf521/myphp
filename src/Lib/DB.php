@@ -74,7 +74,7 @@ class DB
 
 class DbConnection
 {
-    protected $pdo;
+    protected $pdo=null;
     protected $dbfix;
     protected $sQuery;
     protected $join = array();
