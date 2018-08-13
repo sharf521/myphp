@@ -74,7 +74,7 @@ class DB
 
 class DbConnection
 {
-    protected $pdo=null;
+    protected $pdo = null;
     protected $dbfix;
     protected $sQuery;
     protected $join = array();
@@ -91,14 +91,14 @@ class DbConnection
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
     {
         $this->settings = array(
-            'host' => $host,
-            'port' => $port,
-            'user' => $user,
+            'host'     => $host,
+            'port'     => $port,
+            'user'     => $user,
             'password' => $password,
-            'dbname' => $db_name,
-            'charset' => $charset
+            'dbname'   => $db_name,
+            'charset'  => $charset
         );
-        $this->dbfix = $dbfix;
+        $this->dbfix    = $dbfix;
         $this->connect();
     }
 
@@ -106,7 +106,7 @@ class DbConnection
     protected function connect()
     {
         try {
-            $dsn = 'mysql:dbname=' . $this->settings["dbname"] . ';host=' . $this->settings["host"] . ';port=' . $this->settings['port'];
+            $dsn       = 'mysql:dbname=' . $this->settings["dbname"] . ';host=' . $this->settings["host"] . ';port=' . $this->settings['port'];
             $this->pdo = new \PDO($dsn, $this->settings["user"], $this->settings["password"], array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES ' . (!empty($this->settings['charset']) ? $this->settings['charset'] : 'utf8')));
             $this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
@@ -130,7 +130,7 @@ class DbConnection
 //        echo $query . '<br>';
 //        print_r($params);
 //        echo '<br>';
-        try{
+        try {
             $this->sQuery = $this->pdo->prepare($query);
             if (is_array($params)) {
                 foreach ($params as $k => &$v) {
@@ -143,8 +143,8 @@ class DbConnection
             }
             $this->reset();
             return $this->sQuery->execute();
-        }catch(\Exception $e){
-            $this->error_msg("{$query}".json_encode($params));
+        } catch (\Exception $e) {
+            $this->error_msg("{$query}" . json_encode($params));
             echo $e->getMessage();
             throw $e;
         }
@@ -168,11 +168,11 @@ class DbConnection
             mkdir($file_path, 0777, true);
         }
         $filename = $file_path . date("Ym") . ".log";
-        $fp = fopen($filename, "a+");
-        $time = date('Y-m-d H:i:s');
-        $ip=$this->ip();
-        $file = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
-        $str = "time:{$time}\t ip:{$ip}}\t{error:" . $msg . "}\t file:{$file}\t\r\n";
+        $fp       = fopen($filename, "a+");
+        $time     = date('Y-m-d H:i:s');
+        $ip       = $this->ip();
+        $file     = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
+        $str      = "time:{$time}\t ip:{$ip}}\t{error:" . $msg . "}\t file:{$file}\t\r\n";
         fputs($fp, $str);
         fclose($fp);
     }
@@ -235,16 +235,16 @@ class DbConnection
     //////////////////////////////////////
     protected function reset()
     {
-        $this->distinct = '';
-        $this->select = '';
-        $this->table = '';
-        $this->join = array();
+        $this->distinct   = '';
+        $this->select     = '';
+        $this->table      = '';
+        $this->join       = array();
         $this->bindValues = array();
-        $this->where = '';
-        $this->groupBy = '';
-        $this->having = '';
-        $this->orderBy = '';
-        $this->limit = '';
+        $this->where      = '';
+        $this->groupBy    = '';
+        $this->having     = '';
+        $this->orderBy    = '';
+        $this->limit      = '';
     }
 
     private function buildSelect()
@@ -265,38 +265,38 @@ class DbConnection
 
     public function page($page = 1, $pageSize = 10, $mode = \PDO::FETCH_ASSOC)
     {
-        $sql = $this->buildSelect();
-        $pageSql = "SELECT {$this->distinct} count(1) as num FROM {$this->table}"
+        $sql              = $this->buildSelect();
+        $pageSql          = "SELECT {$this->distinct} count(1) as num FROM {$this->table}"
             . $this->buildJoin()
             . $this->where
             . $this->groupBy
             . $this->having;
-        $params = $this->bindValues;
-        $row = $this->get_one($pageSql);
-        $this->bindValues=$params;
-        $total = $row['num'];
-        $pageSize = empty($pageSize) ? 10 : (int)$pageSize;
-        $page = (int)$page;
+        $params           = $this->bindValues;
+        $row              = $this->get_one($pageSql);
+        $this->bindValues = $params;
+        $total            = $row['num'];
+        $pageSize         = empty($pageSize) ? 10 : (int)$pageSize;
+        $page             = (int)$page;
         if ($page > 0) {
             $index = $pageSize * ($page - 1);
         } else {
             $index = 0;
-            $page = 1;
+            $page  = 1;
         }
         if ($index > $total) {
             $index = 0;
-            $page = 1;
+            $page  = 1;
         }
-        $sql .= " limit {$index}, {$pageSize}";
+        $sql  .= " limit {$index}, {$pageSize}";
         $list = $this->get_all($sql, null, $mode);
         global $pager;
-        $pager->page = $page;
+        $pager->page  = $page;
         $pager->epage = $pageSize;
         $pager->total = $total;
         return array(
-            'list' => $list,
+            'list'  => $list,
             'total' => $total,
-            'page' => $pager->show()
+            'page'  => $pager->show()
         );
     }
 
@@ -354,10 +354,10 @@ class DbConnection
     public function where($where)
     {
         if (is_array($where)) {
-            $str = " 1=1";
+            $str    = " 1=1";
             $params = array();
             foreach ($where as $field => $v) {
-                $str .= " and {$field}=:{$field}";
+                $str                .= " and {$field}=:{$field}";
                 $params["{$field}"] = $v;
             }
             $this->where = ' where ' . $str;
@@ -428,7 +428,7 @@ class DbConnection
     public function value($col, $type = 'int|float')
     {
         $this->select = $col;
-        $row = $this->row();
+        $row          = $this->row();
         if (isset($row[$col])) {
             $v = $row[$col];
         } else {
@@ -450,9 +450,9 @@ class DbConnection
         if ($key !== null) {
             $this->select .= ',' . $key;
         }
-        $sql = $this->buildSelect();
+        $sql    = $this->buildSelect();
         $result = $this->get_all($sql);
-        $arr = array();
+        $arr    = array();
         foreach ($result as $k => $v) {
             if ($key == null) {
                 $arr[$k] = $v[$col];
@@ -483,7 +483,7 @@ class DbConnection
             $_sql[] = "`$key`='$value'";
         }
         $value = implode(',', $_sql);
-        $sql = "UPDATE " . $this->table . " SET $value " . $this->where . $this->limit;
+        $sql   = "UPDATE " . $this->table . " SET $value " . $this->where . $this->limit;
 //        echo $sql;
         $this->query($sql);
         return $this->sQuery->rowCount();
@@ -498,7 +498,7 @@ class DbConnection
         }
         $field = substr($field, 0, -1);
         $value = substr($value, 0, -1);
-        $sql = "INSERT INTO " . $this->table . " ($field) VALUES ($value)";
+        $sql   = "INSERT INTO " . $this->table . " ($field) VALUES ($value)";
         $this->query($sql);
         return $this->sQuery->rowCount();
     }
