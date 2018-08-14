@@ -18,10 +18,11 @@ class Rest
         $method  = ($request->get(2) != '') ? $request->get(2) : 'index';
         if (file_exists(ROOT . '/app/Logic/' . ucfirst($control) . 'Logic.php')) {
             $_classpath = "\\App\\Logic\\" . ucfirst($control) . "Logic";
-            $method     = $request_method . ucfirst($method);
+            //$method     = $request_method . ucfirst($method);
         } else {
             $_classpath = '\App\Logic\Logic';
-            $method     = $request_method . ucfirst($control);
+            //$method     = $request_method . ucfirst($control);
+            $method     = $control;
         }
         $class = new $_classpath();
         return self::starting($class, $method);
