@@ -33,19 +33,6 @@ class Rest
         if (!method_exists($class, $method)) {
             $method = 'error';
         }
-        $rMethod      = new \ReflectionMethod($class, $method);
-        $params       = $rMethod->getParameters();
-        $dependencies = array();
-        foreach ($params as $param) {
-            if ($param->getClass()) {
-                $_name = $param->getClass()->name;
-                array_push($dependencies, app($_name));
-            } elseif ($param->isDefaultValueAvailable()) {
-                array_push($dependencies, $param->getDefaultValue());
-            } else {
-                array_push($dependencies, null);
-            }
-        }
-        return call_user_func_array(array($class, $method), $dependencies);
+        return call_user_func_array(array($class, $method), array());
     }
 }
