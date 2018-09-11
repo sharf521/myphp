@@ -289,7 +289,7 @@ class DbConnection
         }
         $sql  .= " limit {$index}, {$pageSize}";
         $list = $this->get_all($sql, null, $mode);
-        global $pager;
+        $pager = app('\System\Lib\Page');
         $pager->page  = $page;
         $pager->epage = $pageSize;
         $pager->total = $total;
