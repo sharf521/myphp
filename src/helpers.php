@@ -1,8 +1,8 @@
 <?php
 if (!function_exists('myErrorHandler')) {
-    function myErrorHandler($errno, $errstr, $errfile, $errline)
+    function myErrorHandler($errNo, $errStr, $errFile, $errLine)
     {
-        if ($errno == E_NOTICE) {
+        if ($errNo == E_NOTICE) {
             return true;
         }
         $file_path = ROOT . "/public/data/logs/";
@@ -12,7 +12,7 @@ if (!function_exists('myErrorHandler')) {
         $filename = $file_path . date("Ym") . ".log";
         $handler = null;
         if (($handler = fopen($filename, 'ab+')) !== false) {
-            fwrite($handler, date('r') . "\t[$errno]$errstr\t$errfile\t$errline\n");
+            fwrite($handler, date('r') . "\t[{$errNo}]{$errStr}\t{$errFile}\t{$errLine}\n");
             fclose($handler);
         }
     }
@@ -30,7 +30,7 @@ if(!function_exists('myExceptionHandler')){
 }
 
 if (!function_exists('url')) {
-    function url($path)
+    function url($path='')
     {
         $_str=strtolower(substr($path,0,8));
         if (substr($_str, 0, 1) != '/' && $_str!='https://' && substr($_str,0,7)!='http://') {
