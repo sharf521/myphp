@@ -294,9 +294,11 @@ class DbConnection
         $pager->epage = $pageSize;
         $pager->total = $total;
         return array(
-            'list'  => $list,
-            'total' => $total,
-            'page'  => $pager->show()
+            'list'      => $list,
+            'total'     => $total,
+            'pageCount' => ceil($total / $pageSize),
+            'pageSize'  => $pageSize,
+            'page'      => $pager->show()
         );
     }
 
