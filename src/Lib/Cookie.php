@@ -1,7 +1,7 @@
 <?php
 namespace System\Lib;
 
-class Session
+class Cookie
 {
     public function set($key, $value = null)
     {
@@ -42,18 +42,6 @@ class Session
         $this->set($key, $array);
     }
 
-    public function flash($key, $value)
-    {
-        $this->set($key, $value);
-        $this->push('flash.new', $key);
-        $this->removeFromOldFlashData(array($key));
-    }
-
-    protected function removeFromOldFlashData(array $keys)
-    {
-        $this->set('flash.old', array_diff($this->get('flash.old', array()), $keys));
-    }
-
     public function debug()
     {
         $arr = array();
@@ -61,19 +49,6 @@ class Session
             $arr[base64_decode($k)] = unserialize($this->DeCode($v, 'D'));
         }
         print_r($arr);
-    }
-
-    //删除一次性session
-    public function flash_remove()
-    {
-        $arr=$this->get('flash.old');
-        if(is_array($arr)){
-            foreach ($arr as $v) {
-                $this->remove($v);
-            }
-        }
-        $this->set('flash.old', $this->get('flash.new'));
-        $this->remove('flash.new');
     }
 
     /**

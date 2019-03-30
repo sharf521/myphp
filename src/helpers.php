@@ -77,6 +77,23 @@ if (!function_exists('session')) {
         }
     }
 }
+
+if (!function_exists('cookie')) {
+    /**
+     * @param string $name
+     * @return \System\Lib\Cookie
+     */
+    function session($name=null)
+    {
+        $cookie=app('\System\Lib\Cookie');
+        if($name===null){
+            return $cookie;
+        }
+        else{
+            return $cookie->get($name);
+        }
+    }
+}
 if (!function_exists('app')) {
     /**
      * @param $className

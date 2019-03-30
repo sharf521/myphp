@@ -7,7 +7,7 @@ class Redirect
     private $is_back=false;
     public function __construct($path='')
     {
-        $this->path=trim($path);
+        $this->path=$path;
         return $this;
     }
     /**
