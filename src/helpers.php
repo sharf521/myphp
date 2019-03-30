@@ -85,7 +85,7 @@ if (!function_exists('cookie')) {
      * @param string $name
      * @return \System\Lib\Cookie
      */
-    function session($name = null)
+    function cookie($name = null)
     {
         $cookie = app('\System\Lib\Cookie');
         if ($name === null) {

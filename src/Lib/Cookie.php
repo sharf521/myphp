@@ -3,22 +3,24 @@ namespace System\Lib;
 
 class Cookie
 {
-    public function set($key, $value = null)
+    public function set($key, $value = null,$minute=60)
     {
+        $expire=time()+60*$minute;
         if (!is_array($key)) {
             $key = array($key => $value);
         }
         foreach ($key as $k => $v) {
             $_key = base64_encode($k);
-            $_SESSION[$_key] = $this->DeCode(serialize($v), 'E');
+            $_val=$this->DeCode(serialize($v), 'E');
+            setcookie($_key,$_val,$expire);
         }
     }
 
     public function get($key, $default = '')
     {
         $_key = base64_encode($key);
-        if(isset($_SESSION[$_key])){
-            $_val = $_SESSION[$_key];
+        if(isset($_COOKIE[$_key])){
+            $_val = $_COOKIE[$_key];
             $value = unserialize($this->DeCode($_val, 'D'));
         }
         if (empty($value)) {
@@ -29,7 +31,7 @@ class Cookie
 
     public function remove($key)
     {
-        unset($_SESSION[base64_encode($key)]);
+        setcookie(base64_encode($key), "", time()-3600);
     }
 
     public function push($key, $value)
@@ -45,7 +47,7 @@ class Cookie
     public function debug()
     {
         $arr = array();
-        foreach ($_SESSION as $k => $v) {
+        foreach ($_COOKIE as $k => $v) {
             $arr[base64_decode($k)] = unserialize($this->DeCode($v, 'D'));
         }
         print_r($arr);
