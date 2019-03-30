@@ -10,30 +10,33 @@ if (!function_exists('myErrorHandler')) {
             mkdir($file_path, 0777, true);
         }
         $filename = $file_path . date("Ym") . ".log";
-        $handler = null;
+        $handler  = null;
         if (($handler = fopen($filename, 'ab+')) !== false) {
             fwrite($handler, date('r') . "\t[{$errNo}]{$errStr}\t{$errFile}\t{$errLine}\n");
             fclose($handler);
         }
     }
+
     set_error_handler('myErrorHandler');
 }
 
-if(!function_exists('myExceptionHandler')){
-    function myExceptionHandler($e){
-        $error= "<b>Exception：</b>" . $e->getMessage();
+if (!function_exists('myExceptionHandler')) {
+    function myExceptionHandler($e)
+    {
+        $error = "<b>Exception：</b>" . $e->getMessage();
         //redirect()->back()->with('error',$error);
         echo $error;
         exit;
     }
+
     set_exception_handler('myExceptionHandler');
 }
 
 if (!function_exists('url')) {
-    function url($path='')
+    function url($path = '')
     {
-        $_str=strtolower(substr($path,0,8));
-        if (substr($_str, 0, 1) != '/' && $_str!='https://' && substr($_str,0,7)!='http://') {
+        $_str = strtolower(substr($path, 0, 8));
+        if (substr($_str, 0, 1) != '/' && $_str != 'https://' && substr($_str, 0, 7) != 'http://') {
             $path = application('base_url') . $path;
         }
         return $path;
@@ -66,13 +69,12 @@ if (!function_exists('session')) {
      * @param string $name
      * @return \System\Lib\Session
      */
-    function session($name=null)
+    function session($name = null)
     {
-        $session=app('\System\Lib\Session');
-        if($name===null){
+        $session = app('\System\Lib\Session');
+        if ($name === null) {
             return $session;
-        }
-        else{
+        } else {
             return $session->get($name);
         }
     }
@@ -83,13 +85,12 @@ if (!function_exists('cookie')) {
      * @param string $name
      * @return \System\Lib\Cookie
      */
-    function session($name=null)
+    function session($name = null)
     {
-        $cookie=app('\System\Lib\Cookie');
-        if($name===null){
+        $cookie = app('\System\Lib\Cookie');
+        if ($name === null) {
             return $cookie;
-        }
-        else{
+        } else {
             return $cookie->get($name);
         }
     }
@@ -102,7 +103,7 @@ if (!function_exists('app')) {
     function app($className)
     {
         if (file_exists(ROOT . '/app/Model/' . ucfirst($className) . '.php')) {
-            $className='\\App\\Model\\' . ucfirst($className);
+            $className = '\\App\\Model\\' . ucfirst($className);
         }
         return \System\Lib\Container::getInstance($className);
     }
@@ -111,8 +112,8 @@ if (!function_exists('app')) {
 if (!function_exists('_token')) {
     function _token()
     {
-        $token=session('_token');
-        if(empty($token)){
+        $token = session('_token');
+        if (empty($token)) {
             $token = md5(time());
         }
         session()->set('_token', $token);
