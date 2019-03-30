@@ -6,21 +6,14 @@ class Cookie
     public function set($key, $value = null,$minute=60)
     {
         $expire=time()+60*$minute;
-        if (!is_array($key)) {
-            $key = array($key => $value);
-        }
-        foreach ($key as $k => $v) {
-            $_key = base64_encode($k);
-            $_val=$this->DeCode(serialize($v), 'E');
-            setcookie($_key,$_val,$expire);
-        }
+        $_val=$this->DeCode(serialize($value), 'E');
+        setcookie($key,$_val,$expire);
     }
 
     public function get($key, $default = '')
     {
-        $_key = base64_encode($key);
-        if(isset($_COOKIE[$_key])){
-            $_val = $_COOKIE[$_key];
+        if(isset($_COOKIE[$key])){
+            $_val = $_COOKIE[$key];
             $value = unserialize($this->DeCode($_val, 'D'));
         }
         if (empty($value)) {
@@ -31,7 +24,7 @@ class Cookie
 
     public function remove($key)
     {
-        setcookie(base64_encode($key), "", time()-3600);
+        setcookie($key, "", time()-3600);
     }
 
     public function push($key, $value)
@@ -47,10 +40,18 @@ class Cookie
     public function debug()
     {
         $arr = array();
-        foreach ($_COOKIE as $k => $v) {
-            $arr[base64_decode($k)] = unserialize($this->DeCode($v, 'D'));
+        foreach ($_COOKIE as $key => $v) {
+            //$key =  base64_decode($key);
+            $arr[$key] = unserialize($this->DeCode($v, 'D'));
         }
         print_r($arr);
+    }
+
+    public function clear()
+    {
+        foreach ($_COOKIE as $key) {
+            setcookie($key, "", time()-3600);
+        }
     }
 
     /**
