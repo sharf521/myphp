@@ -16,7 +16,7 @@ class DB
     {
         if ($config == array()) {
             $config = self::$config;
-        } else {
+        } elseif (empty(self::$config) || $config['default']) {
             self::$config = $config;
         }
         $config_name = $config['host'] . $config['port'] . $config['dbname'];
