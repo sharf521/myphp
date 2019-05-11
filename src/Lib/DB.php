@@ -6,7 +6,7 @@ class DB
 {
     //实例数组
     protected static $instance = array();
-    protected static $config;
+    protected static $config=array();
 
     /**
      * @param array $config
@@ -15,7 +15,12 @@ class DB
     public static function instance($config = array())
     {
         if ($config == array()) {
-            $config = self::$config;
+            if(self::$config!=array()){
+                $config = self::$config;
+            }else{
+                self::$config=DB_CONFIG;
+                $config = self::$config;
+            }
         } elseif (empty(self::$config) || $config['default']) {
             self::$config = $config;
         }
