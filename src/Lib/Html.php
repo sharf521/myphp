@@ -25,7 +25,7 @@ class Html
         if ($data && is_array($data)) {
             foreach ($data as $k => $v) {
                 $from .= '<option value="' . $k . '"';
-                if ($v === $selected) {
+                if ($k === $selected) {
                     $from .= ' selected';
                 }
                 $from .= '>' . $v . '</option>' . PHP_EOL;
@@ -40,7 +40,7 @@ class Html
         if ($data && is_array($data)) {
             foreach ($data as $k => $v) {
                 $from .= '<input type="checkbox" name="'.$name.'" '.$attribute.' value="' . $k . '" title="'.$v.'"';
-                if ($v === $checked) {
+                if ($k === $checked) {
                     $from .= ' checked';
                 }
                 $from .= '>' . PHP_EOL;
@@ -55,7 +55,7 @@ class Html
         if ($data && is_array($data)) {
             foreach ($data as $k => $v) {
                 $from .= '<input type="radio" name="'.$name.'" '.$attribute.' value="' . $k . '" title="'.$v.'"';
-                if ($v === $checked) {
+                if ($k === $checked) {
                     $from .= ' checked';
                 }
                 $from .= '>' . PHP_EOL;
