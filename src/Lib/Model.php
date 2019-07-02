@@ -15,7 +15,7 @@ class Model
 
     public function __construct()
     {
-        $this->dbfix = DB::dbfix();
+
     }
 
     public function __get($key)

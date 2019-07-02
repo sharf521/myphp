@@ -7,7 +7,6 @@ class Controller
 
     public function __construct()
     {
-        $this->dbfix = DB::dbfix();
         $this->control	=application('control');
         $this->func	=application('method');
         $this->self_url=urlencode($_SERVER['PHP_SELF'].'?'.$_SERVER['QUERY_STRING']);
