@@ -21,12 +21,12 @@ class Application
                 break;
             }
         }
-        if($_path==''){
+/*        if($_path==''){
             if (self::$control == app('\App\Model\System')->getCode('houtai')){
                 $_path='Admin';
                 $base_url="/".self::$control."/";
             }
-        }
+        }*/
         if($_path==''){
             if(file_exists(ROOT . '/app/Controller/Home') && is_dir(ROOT . '/app/Controller/Home')){
                 if (file_exists(ROOT . '/app/Controller/Home/' . ucfirst(self::$control) . 'Controller.php')) {
