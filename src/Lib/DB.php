@@ -271,15 +271,28 @@ class DbConnection
     public function page($page = 1, $pageSize = 10, $mode = \PDO::FETCH_ASSOC)
     {
         $sql              = $this->buildSelect();
-        $pageSql          = "SELECT {$this->distinct} count(1) as num FROM {$this->table}"
-            . $this->buildJoin()
-            . $this->where
-            . $this->groupBy
-            . $this->having;
-        $params           = $this->bindValues;
-        $row              = $this->get_one($pageSql);
-        $this->bindValues = $params;
-        $total            = $row['num'];
+        if($this->groupBy!=''){
+            $pageSql          = "SELECT {$this->distinct} 1 FROM {$this->table}"
+                . $this->buildJoin()
+                . $this->where
+                . $this->groupBy
+                . $this->having;
+            $pageSql="select count(1) as num from ($pageSql) as t";
+            $params           = $this->bindValues;
+            $row              = $this->get_one($pageSql);
+            $this->bindValues = $params;
+            $total            = $row['num'];
+        }else{
+            $pageSql          = "SELECT {$this->distinct} count(1) as num FROM {$this->table}"
+                . $this->buildJoin()
+                . $this->where
+                //. $this->groupBy
+                . $this->having;
+            $params           = $this->bindValues;
+            $row              = $this->get_one($pageSql);
+            $this->bindValues = $params;
+            $total            = $row['num'];
+        }
         $pageSize         = empty($pageSize) ? 10 : (int)$pageSize;
         $page             = (int)$page;
         if ($page > 0) {
