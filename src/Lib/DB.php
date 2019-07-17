@@ -5,8 +5,8 @@ namespace System\Lib;
 class DB
 {
     //实例数组
-    protected static $instance = array();
-    protected static $config=array();
+    private static $instance = array();
+    private static $config=array();
 
     /**
      * @param array $config
@@ -79,19 +79,20 @@ class DB
 
 class DbConnection
 {
-    protected $pdo = null;
-    protected $dbfix;
-    protected $sQuery;
-    protected $join = array();
-    protected $bindValues = array();
-    protected $select = '';
-    protected $distinct = '';
-    protected $table = '';
-    protected $where = '';
-    protected $orderBy = '';
-    protected $groupBy = '';
-    protected $having = '';
-    protected $limit = '';
+    private $pdo = null;
+    private $dbfix;
+    private $sQuery;
+    private $join = array();
+    private $bindValues = array();
+    private $select = '';
+    private $distinct = '';
+    private $table = '';
+    private $where = '';
+    private $orderBy = '';
+    private $groupBy = '';
+    private $having = '';
+    private $limit = '';
+    private $debug=array();
 
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
     {
@@ -127,14 +128,18 @@ class DbConnection
         $this->pdo = null;
     }
 
+    public function debug()
+    {
+        return $this->debug;
+    }
+
     public function query($query, $params = null)
     {
         if ($params == null) {
             $params = $this->bindValues;
         }
-//        echo $query . '<br>';
-//        print_r($params);
-//        echo '<br>';
+        $this->debug['sql']=$query;
+        $this->debug['params']=$params;
         try {
             $this->sQuery = $this->pdo->prepare($query);
             if (is_array($params)) {
