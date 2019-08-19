@@ -34,13 +34,13 @@ class Html
         return $from . '</select>';
     }
 
-    public static function checkbox($name = '', $data = array(),$checked='', $attribute = 'lay-skin="primary"'){
+    public static function checkbox($name = '', $data = array(),$checked=array(), $attribute = 'lay-skin="primary"'){
         $attribute = self::_parse_attribute($attribute);
         $from = '';
         if ($data && is_array($data)) {
             foreach ($data as $k => $v) {
                 $from .= '<input type="checkbox" name="'.$name.'" '.$attribute.' value="' . $k . '" title="'.$v.'"';
-                if ((string)$k === (string)$checked) {
+                if (is_array($checked) && in_array($k,$checked)) {
                     $from .= ' checked';
                 }
                 $from .= '>' . PHP_EOL;
