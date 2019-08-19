@@ -40,7 +40,7 @@ class Html
         if ($data && is_array($data)) {
             foreach ($data as $k => $v) {
                 $from .= '<input type="checkbox" name="'.$name.'" '.$attribute.' value="' . $k . '" title="'.$v.'"';
-                if (is_array($checked) && in_array($k,$checked)) {
+                if (is_array($checked) && in_array((string)$k,$checked)) {
                     $from .= ' checked';
                 }
                 $from .= '>' . PHP_EOL;
