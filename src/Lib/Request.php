@@ -160,9 +160,9 @@ class Request
      */
     public function baseUrl($domain = true)
     {
-        $str     = $this->url();
+        $str     = $this->url($domain);
         $baseUrl = strpos($str, '?') ? strstr($str, '?', true) : $str;
-        return true === $domain ? $this->domain() . $baseUrl : $baseUrl;
+        return $baseUrl;
     }
 
     /**
