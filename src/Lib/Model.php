@@ -87,6 +87,16 @@ class Model
         }
     }
 
+    public function destroy()
+    {
+        if($this->is_exist){
+            $primaryKey=$this->primaryKey;
+            return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->delete();
+        }else{
+            return 0;
+        }
+    }
+
     public function hasOne($class, $foreign_key, $local_key = 'id')
     {
         return app($class)->where("{$foreign_key}='{$this->$local_key}'")->first();
