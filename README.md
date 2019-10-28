@@ -1,5 +1,8 @@
 my doing....
 
+add Model->destroy()
+
+
 test11
 
 移除 $GLOBALS['system']
