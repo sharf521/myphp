@@ -1,7 +1,6 @@
 my doing....
 
-add Model->destroy()
-
+添加 Model->destroy()
 
 test11
 
