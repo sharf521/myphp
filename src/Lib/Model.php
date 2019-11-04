@@ -87,6 +87,11 @@ class Model
         }
     }
 
+    public function del_db()
+    {
+        return DB::table($this->table)->delete();
+    }
+
     public function destroy()
     {
         if($this->is_exist){
