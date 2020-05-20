@@ -24,8 +24,22 @@ if (!function_exists('myExceptionHandler')) {
     function myExceptionHandler($e)
     {
         $error = "<b>Exception：</b>" . $e->getMessage();
-        //redirect()->back()->with('error',$error);
-        echo $error;
+        $data = array(
+            'return_code' => 'fail',
+            'return_msg' => $error
+        );
+        echo json_encode($data);
+
+        $file_path = ROOT . "/public/data/logs/";
+        if (!is_dir($file_path)) {
+            mkdir($file_path, 0777, true);
+        }
+        $filename = $file_path . date("Ym") . "exception.log";
+        $handler  = null;
+        if (($handler = fopen($filename, 'ab+')) !== false) {
+            fwrite($handler, date('r') . "\t[{$error}\n");
+            fclose($handler);
+        }
         exit;
     }
 
