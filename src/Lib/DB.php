@@ -274,6 +274,7 @@ class DbConnection
 
     public function page($page = 1, $pageSize = 10, $mode = \PDO::FETCH_ASSOC)
     {
+        $_sql  = $this->buildSelect() ;
         if ($this->groupBy != '') {
             $sql1             = "SELECT {$this->distinct} 1 FROM {$this->table}"
                 . $this->buildJoin()
@@ -308,9 +309,8 @@ class DbConnection
             $index = 0;
             $page  = 1;
         }
-
         if ($total > 0) {
-            $sql  = $this->buildSelect() . " limit {$index}, {$pageSize}";
+            $sql  = $_sql . " limit {$index}, {$pageSize}";
             $list = $this->get_all($sql, null, $mode);
         } else {
             $list = array();
