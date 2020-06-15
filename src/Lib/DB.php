@@ -6,7 +6,7 @@ class DB
 {
     //实例数组
     private static $instance = array();
-    private static $config=array();
+    private static $config = array();
 
     /**
      * @param array $config
@@ -15,11 +15,11 @@ class DB
     public static function instance($config = array())
     {
         if ($config == array()) {
-            if(self::$config!=array()){
+            if (self::$config != array()) {
                 $config = self::$config;
-            }else{
-                self::$config=DB_CONFIG;
-                $config = self::$config;
+            } else {
+                self::$config = DB_CONFIG;
+                $config       = self::$config;
             }
         } elseif (empty(self::$config) || $config['default']) {
             self::$config = $config;
@@ -92,7 +92,7 @@ class DbConnection
     private $groupBy = '';
     private $having = '';
     private $limit = '';
-    private $debug=array();
+    private $debug = array();
 
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
     {
@@ -138,8 +138,8 @@ class DbConnection
         if ($params == null) {
             $params = $this->bindValues;
         }
-        $this->debug['sql']=$query;
-        $this->debug['params']=$params;
+        $this->debug['sql']    = $query;
+        $this->debug['params'] = $params;
         try {
             $this->sQuery = $this->pdo->prepare($query);
             if (is_array($params)) {
@@ -269,37 +269,35 @@ class DbConnection
             . $this->having
             . $this->orderBy
             . $this->limit;
-        // echo $sql;
         return $sql;
     }
 
     public function page($page = 1, $pageSize = 10, $mode = \PDO::FETCH_ASSOC)
     {
-        $sql              = $this->buildSelect();
-        if($this->groupBy!=''){
-            $pageSql          = "SELECT {$this->distinct} 1 FROM {$this->table}"
+        if ($this->groupBy != '') {
+            $sql1             = "SELECT {$this->distinct} 1 FROM {$this->table}"
                 . $this->buildJoin()
                 . $this->where
                 . $this->groupBy
                 . $this->having;
-            $pageSql="select count(1) as num from ($pageSql) as t";
+            $sql              = "select count(1) as num from ($sql1) as t";
             $params           = $this->bindValues;
-            $row              = $this->get_one($pageSql);
+            $row              = $this->get_one($sql);
             $this->bindValues = $params;
             $total            = $row['num'];
-        }else{
-            $pageSql          = "SELECT {$this->distinct} count(1) as num FROM {$this->table}"
+        } else {
+            $sql              = "SELECT {$this->distinct} count(1) as num FROM {$this->table}"
                 . $this->buildJoin()
                 . $this->where
                 //. $this->groupBy
                 . $this->having;
             $params           = $this->bindValues;
-            $row              = $this->get_one($pageSql);
+            $row              = $this->get_one($sql);
             $this->bindValues = $params;
             $total            = $row['num'];
         }
-        $pageSize         = empty($pageSize) ? 10 : (int)$pageSize;
-        $page             = (int)$page;
+        $pageSize = empty($pageSize) ? 10 : (int)$pageSize;
+        $page     = (int)$page;
         if ($page > 0) {
             $index = $pageSize * ($page - 1);
         } else {
@@ -310,9 +308,14 @@ class DbConnection
             $index = 0;
             $page  = 1;
         }
-        $sql  .= " limit {$index}, {$pageSize}";
-        $list = $this->get_all($sql, null, $mode);
-        $pager = app('\System\Lib\Page');
+
+        if ($total > 0) {
+            $sql  = $this->buildSelect() . " limit {$index}, {$pageSize}";
+            $list = $this->get_all($sql, null, $mode);
+        } else {
+            $list = array();
+        }
+        $pager        = app('\System\Lib\Page');
         $pager->page  = $page;
         $pager->epage = $pageSize;
         $pager->total = $total;
