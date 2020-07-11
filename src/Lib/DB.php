@@ -34,6 +34,7 @@ class DB
                 $config       = self::$config;
             }
         } elseif (empty(self::$config) || $config['default']) {
+            //不改变config，再次使用mode时 不需要切换config.
             self::$config = $config;
         }
         $config_name = $config['host'] . $config['port'] . $config['dbname'];
