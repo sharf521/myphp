@@ -169,8 +169,8 @@ class Model
             $this->is_exist = false;
             return $this;
         }else{
-            //$obj = clone $this;
-            $obj=new static();
+            $obj = clone $this;
+            //$obj=new static();
             $id = $obj->primaryKey;
             $obj->attributes[$id] = $o->$id;
             $obj->is_exist = true;
