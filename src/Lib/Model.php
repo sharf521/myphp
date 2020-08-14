@@ -270,9 +270,9 @@ class Model
         return $this;
     }
 
-    public function distinct()
+    public function distinct($columns=[])
     {
-        DB::distinct();
+        DB::distinct($columns);
         return $this;
     }
 

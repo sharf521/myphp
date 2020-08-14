@@ -297,9 +297,13 @@ class DbConnection
         array_push($this->join, " {$join} JOIN {$table} ON {$cond} ");
     }
 
-    public function distinct()
+    public function distinct($columns=[])
     {
-        $this->distinct = 'distinct';
+        if(is_array($columns) && count($columns)>0){
+            $this->distinct = 'distinct '.implode(', ',$columns);
+        }else{
+            $this->distinct = 'distinct';
+        }
         return $this;
     }
 
