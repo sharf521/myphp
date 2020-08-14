@@ -374,9 +374,7 @@ class DbConnection
     //取一行
     public function row($mode = \PDO::FETCH_ASSOC)
     {
-        if($this->limit==''){
-            $this->limit(1);
-        }
+        $this->limit(1);//只能返回一行
         $sql = $this->buildSelect();
         return $this->get_one($sql, null, $mode);
     }

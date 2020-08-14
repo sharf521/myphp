@@ -170,7 +170,7 @@ class Model
             return $this;
         }else{
             $obj = clone $this;
-            //$obj=new static();
+            //$obj=new static();//弃用：构造方法里调用自己 会死循环
             $id = $obj->primaryKey;
             $obj->attributes[$id] = $o->$id;
             $obj->is_exist = true;
