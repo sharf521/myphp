@@ -17,6 +17,7 @@ class DbConnection
     private $groupBy = '';
     private $having = '';
     private $limit = '';
+    private $lockForUpdate='';
     private $debug = array();
 
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
@@ -193,7 +194,8 @@ class DbConnection
             . $this->groupBy
             . $this->having
             . $this->orderBy
-            . $this->limit;
+            . $this->limit
+            . $this->lockForUpdate;
         return $sql;
     }
 
@@ -342,6 +344,12 @@ class DbConnection
     public function limit($str)
     {
         $this->limit = ' limit ' . $str;
+        return $this;
+    }
+
+    public function lockForUpdate()
+    {
+        $this->lockForUpdate=' for update';
         return $this;
     }
 

@@ -1,6 +1,7 @@
 <?php
 namespace System\Lib;
 
+//Model 应优先使用静态方法
 class Model
 {
     //属性必须在这里声明
@@ -11,6 +12,7 @@ class Model
     protected $cols;
     protected $dbfix;
     protected $primaryKey = 'id';
+    //protected $forceDeleting=false;//设置软删除 deleted_at  forceDelete()
     public $is_exist = false;
 
     public function __construct()
@@ -73,23 +75,26 @@ class Model
      * @param null int array $id
      * @return mixed
      */
-    public function delete($id=null)
+    public function delete($id = null)
     {
-        if($id==null){
-            $primaryKey=$this->primaryKey;
+        if ($id == null) {
+            $primaryKey = $this->primaryKey;
             return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->delete();
-        }else{
-            if(is_array($id)){
+        } else {
+            if (is_array($id)) {
                 return DB::table($this->table)->where($id)->delete();
-            }else{
+            } else {
                 return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($id)->delete();
             }
         }
-    }
-
-    public function del_db()
-    {
-        return DB::table($this->table)->delete();
+        /*
+        if (isset($this->attributes[$this->primaryKey])) {
+            $primaryKey=$this->primaryKey;
+            return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->delete();
+        }else{
+            return DB::table($this->table)->delete();
+        }
+        */
     }
 
     public function destroy()
@@ -301,6 +306,12 @@ class Model
     public function limit($str)
     {
         DB::limit($str);
+        return $this;
+    }
+
+    public function lockForUpdate()
+    {
+        DB::lockForUpdate();
         return $this;
     }
 
