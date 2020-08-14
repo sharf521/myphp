@@ -181,6 +181,7 @@ class DbConnection
         $this->having     = '';
         $this->orderBy    = '';
         $this->limit      = '';
+        $this->lockForUpdate='';
     }
 
     private function buildSelect()
@@ -232,10 +233,10 @@ class DbConnection
             $index = 0;
             $page  = 1;
         }
-        if ($index > $total) {
+/*        if ($index > $total) {
             $index = 0;
             $page  = 1;
-        }
+        }*/
         if ($total > 0) {
             $sql  = $_sql . " limit {$index}, {$pageSize}";
             $list = $this->get_all($sql, null, $mode);
@@ -373,7 +374,10 @@ class DbConnection
     //取一行
     public function row($mode = \PDO::FETCH_ASSOC)
     {
-        $sql = $this->buildSelect() . " limit 1";
+        if($this->limit==''){
+            $this->limit(1);
+        }
+        $sql = $this->buildSelect();
         return $this->get_one($sql, null, $mode);
     }
 
