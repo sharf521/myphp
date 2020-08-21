@@ -23,7 +23,7 @@ if (!function_exists('myErrorHandler')) {
 if (!function_exists('myExceptionHandler')) {
     function myExceptionHandler($e)
     {
-        $error = "<b>Exception：</b>" . $e->getMessage();
+        $error = "<b>Line：" . $e->getLine() . "</b> " . $e->getMessage();
         $data  = array(
             'return_code' => 'fail',
             'return_msg'  => $error
