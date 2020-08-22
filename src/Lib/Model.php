@@ -70,42 +70,6 @@ class Model
         }
         return $post;
     }
-    
-    /**
-     * @param null int array $id
-     * @return mixed
-     */
-    public function delete($id = null)
-    {
-        if ($id == null) {
-            $primaryKey = $this->primaryKey;
-            return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->delete();
-        } else {
-            if (is_array($id)) {
-                return DB::table($this->table)->where($id)->delete();
-            } else {
-                return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($id)->delete();
-            }
-        }
-        /*
-        if (isset($this->attributes[$this->primaryKey])) {
-            $primaryKey=$this->primaryKey;
-            return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->delete();
-        }else{
-            return DB::table($this->table)->delete();
-        }
-        */
-    }
-
-    public function destroy()
-    {
-        if($this->is_exist){
-            $primaryKey=$this->primaryKey;
-            return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->delete();
-        }else{
-            return 0;
-        }
-    }
 
     public function hasOne($class, $foreign_key, $local_key = 'id')
     {
@@ -240,10 +204,35 @@ class Model
             }
         }
     }
-///////以下DB类方法/////////////////////////////////////////////////////////////////////////////////
+
+///////以下DB类方法////////////
+
+    public function delete()
+    {
+        if($this->is_exist){
+            $primaryKey=$this->primaryKey;
+            return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->delete();
+        }else{
+            $id=func_get_arg(0);
+            if(!empty($id)){
+                if (is_array($id)) {
+                    return DB::table($this->table)->where($id)->delete();
+                } else {
+                    return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($id)->delete();
+                }
+            }else{
+                return DB::table($this->table)->delete();
+            }
+        }
+    }
     public function update($array)
     {
-        return DB::table($this->table)->update($array);
+        if($this->is_exist){
+            $primaryKey=$this->primaryKey;
+            return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->update($array);
+        }else{
+            return DB::table($this->table)->update($array);
+        }
     }
     public function insert($array)
     {
