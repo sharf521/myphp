@@ -227,12 +227,13 @@ class Model
     }
     public function update($array)
     {
-        if($this->is_exist){
+        return DB::table($this->table)->update($array);
+/*        if($this->is_exist){
             $primaryKey=$this->primaryKey;
             return DB::table($this->table)->where($this->primaryKey . "=?")->bindValues($this->$primaryKey)->update($array);
         }else{
             return DB::table($this->table)->update($array);
-        }
+        }*/
     }
     public function insert($array)
     {
