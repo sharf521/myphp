@@ -23,10 +23,9 @@ if (!function_exists('myErrorHandler')) {
 if (!function_exists('myExceptionHandler')) {
     function myExceptionHandler($e)
     {
-        $error = "<b>Line：" . $e->getLine() . "</b> " . $e->getMessage();
-        $data  = array(
+        $data = array(
             'return_code' => 'fail',
-            'return_msg'  => $error
+            'return_msg'  => $e->getMessage()
         );
         echo json_encode($data);
 
@@ -37,8 +36,9 @@ if (!function_exists('myExceptionHandler')) {
         $filename = $file_path . date("Ym") . "exception.log";
         $handler  = null;
         if (($handler = fopen($filename, 'ab+')) !== false) {
-            $file = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
-            fwrite($handler, date('d H:i:s') . "\t file:{$file} \t[{$error}\n");
+            $file  = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
+            $error = $e->getFile() . " Line " . $e->getLine() . " " . $e->getMessage();
+            fwrite($handler, date('d H:i:s') . "\t url:{$file} \t[{$error}\n");
             fclose($handler);
         }
         exit;
