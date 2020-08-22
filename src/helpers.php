@@ -12,7 +12,7 @@ if (!function_exists('myErrorHandler')) {
         $filename = $file_path . date("Ym") . ".log";
         $handler  = null;
         if (($handler = fopen($filename, 'ab+')) !== false) {
-            fwrite($handler, date('d H:i:s') . "\t[{$errNo}]{$errStr}\t{$errFile}\t{$errLine}\n");
+            fwrite($handler, date('Y-m-d H:i:s') . "\t[{$errNo}]{$errStr}\t{$errFile}\t{$errLine}\n");
             fclose($handler);
         }
     }
@@ -38,7 +38,7 @@ if (!function_exists('myExceptionHandler')) {
         if (($handler = fopen($filename, 'ab+')) !== false) {
             $file  = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
             $error = $e->getFile() . " Line " . $e->getLine() . " " . $e->getMessage();
-            fwrite($handler, date('d H:i:s') . "\t url:{$file} \t[{$error}\n");
+            fwrite($handler, date('Y-m-d H:i:s') . "\t url:{$file} \t[{$error}\n");
             fclose($handler);
         }
         exit;
