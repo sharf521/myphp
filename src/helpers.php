@@ -51,7 +51,14 @@ if (!function_exists('url')) {
     function url($path = '')
     {
         $_str = strtolower(substr($path, 0, 8));
-        if (substr($_str, 0, 1) != '/' && $_str != 'https://' && substr($_str, 0, 7) != 'http://') {
+        if ($_str == 'https://' && substr($_str, 0, 7) == 'http://') {
+            return $path;
+        }
+        if (substr($path, 0, 1) == '/') {
+            if (\System\Lib\Application::$isRewrite == false) {
+                $path = '/' . basename($_SERVER['SCRIPT_NAME']) . $path;
+            }
+        } else {
             $path = application('base_url') . $path;
         }
         return $path;

@@ -7,17 +7,22 @@ class Application
     public static $control;
     public static $method;
     public static $base_url;
+    public static $isRewrite=true;
     public static function start($routes=array())
     {
         $request=app('\System\Lib\Request');
         self::$control=($request->get(0) != '') ? $request->get(0) : 'index';
         self::$method=($request->get(1) != '') ? $request->get(1) : 'index';
-        $base_url="/";
+        if(self::$isRewrite){
+            $base_url="/";
+        }else{
+            $base_url='/'.basename($_SERVER['SCRIPT_NAME']).'/';
+        }
         $_path='';
         foreach ($routes as $k=>$v){
             if (self::$control == $k) {
                 $_path=$v;
-                $base_url="/{$k}/";
+                $base_url.="{$k}/";
                 break;
             }
         }
