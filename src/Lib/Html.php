@@ -19,7 +19,7 @@ class Html
         return '<img src="' . $src . '" ' . $attribute . '>';
     }
 
-    public static function select($name = '', $data = array(),$selected='',$attribute = "class='layui-select'"){
+    public static function select($name = '', $data = array(),$selected='',$attribute = ""){
         $attribute = self::_parse_attribute($attribute);
         $from = '<select ' . $attribute . ' name="' . $name . '">' . PHP_EOL;
         if ($data && is_array($data)) {
