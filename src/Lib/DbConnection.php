@@ -19,6 +19,7 @@ class DbConnection
     private $limit = '';
     private $lockForUpdate='';
     private $debug = array();
+    private $settings=array();
 
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
     {
@@ -61,6 +62,7 @@ class DbConnection
 
     public function query($query, $params = null)
     {
+        $tag=false;
         if ($params == null) {
             $params = $this->bindValues;
         }
@@ -77,13 +79,13 @@ class DbConnection
                     }
                 }
             }
-            $this->reset();
-            return $this->sQuery->execute();
+            $tag=$this->sQuery->execute();
         } catch (\Exception $e) {
-            $this->error_msg("{$query}" . json_encode($params));
-            echo $e->getMessage();
+            $this->error_msg("{$query}" . json_encode($params).',msg:'.$e->getMessage().'，code:'.$e->getCode());
             throw $e;
         }
+        $this->reset();
+        return $tag;
 //        $rawStatement = explode(" ", trim($query));
 //        $statement = strtolower($rawStatement[0]);
 //        if ($statement === 'select' || $statement === 'show') {
@@ -160,6 +162,7 @@ class DbConnection
     //禁止克隆
     final public function __clone()
     {
+
     }
 
     //析构函数-资源回收
@@ -297,7 +300,7 @@ class DbConnection
         array_push($this->join, " {$join} JOIN {$table} ON {$cond} ");
     }
 
-    public function distinct($columns=[])
+    public function distinct($columns=array())
     {
         if(is_array($columns) && count($columns)>0){
             $this->distinct = 'distinct '.implode(', ',$columns);
