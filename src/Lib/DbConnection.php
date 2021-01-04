@@ -80,8 +80,8 @@ class DbConnection
                 }
             }
             $tag=$this->sQuery->execute();
-        } catch (\Exception $e) {
-            $this->error_msg("{$query}" . json_encode($params).',msg:'.$e->getMessage().'，code:'.$e->getCode());
+        } catch (\PDOException $e) {
+            $this->error_msg("{$query}" . json_encode($params).',msg:'.$e->getMessage().'，code:'.$e->getCode().'，info:'.json_encode($e->errorInfo));
             throw $e;
         }
         $this->reset();
