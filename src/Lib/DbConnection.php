@@ -81,7 +81,7 @@ class DbConnection
             }
             $tag=$this->sQuery->execute();
         } catch (\PDOException $e) {
-            $this->error_msg("1:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，code:'.$e->getCode().'，info:'.json_encode($e->errorInfo));
+            $this->error_msg("1:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
             if ($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
                $this->closeConnection();
                $this->connect();
@@ -98,12 +98,12 @@ class DbConnection
                    }
                    $tag=$this->sQuery->execute();
                }catch (\PDOException $e){
-                   $this->error_msg("2:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，code:'.$e->getCode().'，info:'.json_encode($e->errorInfo));
+                   $this->error_msg("2:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
                    $this->rollBack();
                    throw $e;
                }
             }else{
-                $this->error_msg("3:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，code:'.$e->getCode().'，info:'.json_encode($e->errorInfo));
+                $this->error_msg("3:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
                 $this->rollBack();
                 throw $e;
             }
