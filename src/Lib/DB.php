@@ -11,7 +11,8 @@ namespace System\Lib;
  * @method static beginTransaction()    开始事务
  * @method static commit()    提交事务
  * @method static rollBack()  事务回滚
- * @method static query($sql,$params=null)
+ * @method static query($sql, $params = null)
+ * @method static debug()
  *
  */
 

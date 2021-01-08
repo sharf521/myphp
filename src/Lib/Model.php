@@ -89,7 +89,7 @@ class Model
         return app($class)->where($whe)->orderBy($order)->get();
     }
 
-    //获取联动值
+    //获取联动值 应移出
     public function getLinkPageName($code, $codeKey)
     {
         $result = app('\App\Model\LinkPage')->getLinkPage();
@@ -256,6 +256,13 @@ class Model
 
     public function select($str)
     {
+        if(trim($str)!='*' && strpos($str,'(')===false){
+            //没有方法的一般查询必须加上主键, save() delete()的时候
+            $arr=explode(',',$str);
+            if(!in_array($this->primaryKey,$arr)){
+                $str=$this->primaryKey.','.$str;
+            }
+        }
         DB::select($str);
         return $this;
     }
