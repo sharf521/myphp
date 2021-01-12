@@ -198,10 +198,14 @@ class Model
         } else {
             $this->attributes['created_at']=time();
             if($returnId){
-                return DB::table($this->table)->insertGetId($this->attributes);
+                $num=DB::table($this->table)->insertGetId($this->attributes);
             }else{
-                return DB::table($this->table)->insert($this->attributes);
+                $num=DB::table($this->table)->insert($this->attributes);
             }
+            if ($num === 1) {
+                $this->is_exist = true;
+            }
+            return $num;
         }
     }
 
