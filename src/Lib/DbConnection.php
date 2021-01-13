@@ -4,6 +4,9 @@ namespace System\Lib;
 
 class DbConnection
 {
+    /**
+     * @var \PDO
+     */
     private $pdo = null;
     private $dbfix;
     private $sQuery;
@@ -499,7 +502,15 @@ class DbConnection
 
     public function insertGetId($data = array())
     {
-        $this->insert($data);
+        $num=$this->insert($data);
+        if($num>0){
+            return $this->pdo->lastInsertId();
+        }
+        return 0;
+    }
+
+    public function lastInsertId()
+    {
         return $this->pdo->lastInsertId();
     }
 

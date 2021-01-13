@@ -13,6 +13,7 @@ namespace System\Lib;
  * @method static rollBack()  事务回滚
  * @method static query($sql, $params = null)
  * @method static debug()
+ * @method static lastInsertId()
  *
  */
 
