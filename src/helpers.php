@@ -51,7 +51,7 @@ if (!function_exists('url')) {
     function url($path = '')
     {
         $_str = strtolower(substr($path, 0, 8));
-        if ($_str == 'https://' && substr($_str, 0, 7) == 'http://') {
+        if ($_str == 'https://' || substr($_str, 0, 7) == 'http://') {
             return $path;
         }
         if (substr($path, 0, 1) == '/') {
