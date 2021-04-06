@@ -25,22 +25,20 @@ class Model
 
     public function __get($key)
     {
+        $val = '';
         if (isset($this->attributes[$key])) {
             $val = $this->attributes[$key];
         } else {
             if (isset($this->cols->$key)) {
                 $val = $this->cols->$key;
-            } else {
-                $val = null;
             }
         }
         if (in_array($key, $this->dates)) {
-            if ($val != 0) {
+            if ($val != 0 && $val != '') {
                 return date('Y-m-d H:i:s', $val);
             }
-        } else {
-            return $val;
         }
+        return $val;
     }
 
     public function __set($key, $value)
