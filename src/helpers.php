@@ -61,7 +61,6 @@ if (!function_exists('myExceptionHandler')) {
             fwrite($handler, date('Y-m-d H:i:s') . "\t url:{$file} \t[{$error}\n");
             fclose($handler);
         }
-        exit;
     }
 
     set_exception_handler('myExceptionHandler');
