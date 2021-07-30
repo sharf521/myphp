@@ -8,14 +8,14 @@ class DbConnection
      * @var \PDO
      */
     private $pdo = null;
-    private $dbfix;
+    private $dbfix='';
     /**
      * @var \PDOStatement
      */
     private $sQuery;
-    private $join = array();
-    private $bindValues = array();
-    private $expValues=array();
+    private $join = [];
+    private $bindValues = [];
+    private $expValues=[];
     private $select = '';
     private $distinct = '';
     private $table = '';
@@ -25,19 +25,19 @@ class DbConnection
     private $having = '';
     private $limit = '';
     private $lockForUpdate='';
-    private $debug = array();
-    private $settings=array();
+    private $debug = [];
+    private $settings=[];
 
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
     {
-        $this->settings = array(
+        $this->settings = [
             'host'     => $host,
             'port'     => $port,
             'user'     => $user,
             'password' => $password,
             'dbname'   => $db_name,
             'charset'  => $charset
-        );
+        ];
         $this->dbfix    = $dbfix;
         $this->connect();
     }
@@ -444,7 +444,7 @@ class DbConnection
         return $this->buildSelect();
     }
 
-    public function getRealSql($sql,$bind=array())
+    public function getRealSql($sql,$bind=[])
     {
         if(empty($bind)){
             $bind = $this->bindValues;
@@ -527,7 +527,7 @@ class DbConnection
         return $this->sQuery->rowCount();
     }
 
-    public function update($data = array())
+    public function update(array $data = [])
     {
         $_sql =[];
         if(!empty($this->expValues)){
@@ -546,7 +546,7 @@ class DbConnection
     }
 
     //没有绑定参数时可以使用
-    public function updateForNoBind($data = array())
+    public function updateForNoBind(array $data)
     {
         $_sql = array();
         foreach ($data as $key => $value) {
@@ -558,7 +558,7 @@ class DbConnection
         return $this->sQuery->rowCount();
     }
 
-    public function insert($data = array())
+    public function insert(array $data)
     {
         $field = $value = '';
         foreach ($data as $key => $val) {
@@ -575,7 +575,7 @@ class DbConnection
         return $this->sQuery->rowCount();
     }
 
-    public function insertGetId($data = array())
+    public function insertGetId(array $data)
     {
         $num=$this->insert($data);
         if($num>0){
