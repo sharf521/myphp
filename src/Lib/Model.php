@@ -251,7 +251,7 @@ class Model
         }
     }
 
-    public function update($array)
+    public function update($array=array())
     {
         return DB::table($this->table)->update($array);
         /*        if($this->is_exist){
@@ -299,6 +299,24 @@ class Model
     public function distinct($columns = array())
     {
         DB::distinct($columns);
+        return $this;
+    }
+
+    public function exp(string $field, string $value)
+    {
+        DB::exp($field,$value);
+        return $this;
+    }
+
+    public function inc(string $field, string $value)
+    {
+        DB::inc($field,$value);
+        return $this;
+    }
+
+    public function dec(string $field, string $value)
+    {
+        DB::dec($field,$value);
         return $this;
     }
 

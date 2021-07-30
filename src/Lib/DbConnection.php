@@ -15,6 +15,7 @@ class DbConnection
     private $sQuery;
     private $join = array();
     private $bindValues = array();
+    private $expValues=array();
     private $select = '';
     private $distinct = '';
     private $table = '';
@@ -182,6 +183,24 @@ class DbConnection
             $this->pdo->rollBack();
         }
     }
+
+
+    public function transaction(callable $callback)
+    {
+        $this->beginTransaction();
+        try {
+            $result = null;
+            if (is_callable($callback)) {
+                $result = $callback($this);
+            }
+            $this->commit();
+            return $result;
+        } catch (\Exception | \Throwable $e) {
+            $this->rollBack();
+            throw $e;
+        }
+    }
+
 
     //禁止克隆
     final public function __clone()
@@ -397,6 +416,29 @@ class DbConnection
         return $this;
     }
 
+    //更新的数据需要使用SQL函数或者其它字段
+    public function exp(string $field, string $value)
+    {
+        $this->expValues[$field]=$value;
+        return $this;
+    }
+
+    //自增一个字段的值
+    public function inc($name,$step=1)
+    {
+        $step=floatval($step);
+        $this->exp($name,"`{$name}` + {$step}");
+        return $this;
+    }
+
+    //自减一个字段的值
+    public function dec($name,$step=1)
+    {
+        $step=floatval($step);
+        $this->exp($name,"`{$name}` - {$step}");
+        return $this;
+    }
+
     public function getSql()
     {
         return $this->buildSelect();
@@ -485,24 +527,17 @@ class DbConnection
         return $this->sQuery->rowCount();
     }
 
-    public function incOrDec($name,$step=1)
-    {
-        $step=floatval($step);
-        if($step>0){
-            $set=" SET `{$name}`= `{$name}` + {$step}";
-        }else{
-            $set=" SET `{$name}`= `{$name}` {$step}";
-        }
-        $sql   = "UPDATE " . $this->table . $set . $this->where . $this->limit;
-        $this->query($sql);
-        return $this->sQuery->rowCount();
-    }
-
     public function update($data = array())
     {
-        $_sql = array();
-        foreach ($data as $key => $value) {
-            $_sql[] = "`$key`='".addslashes($value)."'";
+        $_sql =[];
+        if(!empty($this->expValues)){
+            foreach ($this->expValues as $key => $value) {
+                $_sql[] = "`$key`={$value}";
+            }
+        }else{
+            foreach ($data as $key => $value) {
+                $_sql[] = "`$key`='".addslashes($value)."'";
+            }
         }
         $value = implode(',', $_sql);
         $sql   = "UPDATE " . $this->table . " SET $value " . $this->where . $this->limit;
