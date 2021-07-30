@@ -9,6 +9,9 @@ class DbConnection
      */
     private $pdo = null;
     private $dbfix;
+    /**
+     * @var \PDOStatement
+     */
     private $sQuery;
     private $join = array();
     private $bindValues = array();
@@ -74,39 +77,33 @@ class DbConnection
         try {
             $this->sQuery = $this->pdo->prepare($query);
             if (is_array($params)) {
-                foreach ($params as $k => &$v) {
-                    if (is_string($k)) {
-                        $this->sQuery->bindParam(':' . $k, $v);
-                    } else {
-                        $this->sQuery->bindParam($k + 1, $v);
-                    }
+                foreach ($params as $k => $v) {
+                    $_param = is_numeric($k) ? $k + 1 : ':' . $k;
+                    $this->sQuery->bindValue($_param, $v);
                 }
             }
             $tag=$this->sQuery->execute();
         } catch (\PDOException $e) {
-            $this->error_msg("1:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+            $this->error_msg("1:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
             if ($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
-               $this->closeConnection();
-               $this->connect();
-               try{
-                   $this->sQuery = $this->pdo->prepare($query);
-                   if (is_array($params)) {
-                       foreach ($params as $k => &$v) {
-                           if (is_string($k)) {
-                               $this->sQuery->bindParam(':' . $k, $v);
-                           } else {
-                               $this->sQuery->bindParam($k + 1, $v);
-                           }
-                       }
-                   }
-                   $tag=$this->sQuery->execute();
-               }catch (\PDOException $e){
-                   $this->error_msg("2:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
-                   $this->rollBack();
-                   throw $e;
-               }
+                $this->closeConnection();
+                $this->connect();
+                try{
+                    $this->sQuery = $this->pdo->prepare($query);
+                    if (is_array($params)) {
+                        foreach ($params as $k => $v) {
+                            $_param = is_numeric($k) ? $k + 1 : ':' . $k;
+                            $this->sQuery->bindValue($_param, $v);
+                        }
+                    }
+                    $tag=$this->sQuery->execute();
+                }catch (\PDOException $e){
+                    $this->error_msg("2:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+                    $this->rollBack();
+                    throw $e;
+                }
             }else{
-                $this->error_msg("3:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+                $this->error_msg("3:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
                 $this->rollBack();
                 throw $e;
             }
@@ -263,10 +260,10 @@ class DbConnection
             $index = 0;
             $page  = 1;
         }
-/*        if ($index > $total) {
-            $index = 0;
-            $page  = 1;
-        }*/
+        /*        if ($index > $total) {
+                    $index = 0;
+                    $page  = 1;
+                }*/
         if ($total > 0) {
             $sql  = $_sql . " limit {$index}, {$pageSize}";
             $list = $this->get_all($sql, null, $mode);
@@ -395,7 +392,7 @@ class DbConnection
                 $this->bindValues[$key] = $val;
             }
         } else {
-            array_push($this->bindValues, $values);
+            $this->bindValues[]=$values;
         }
         return $this;
     }
@@ -403,6 +400,21 @@ class DbConnection
     public function getSql()
     {
         return $this->buildSelect();
+    }
+
+    public function getRealSql($sql,$bind=array())
+    {
+        if(empty($bind)){
+            $bind = $this->bindValues;
+        }
+        foreach ($bind as $key => $value) {
+            $value = '\'' . addslashes($value) . '\'';
+            // 判断占位符
+            $sql = is_numeric($key) ?
+                substr_replace($sql, $value, strpos($sql, '?'), 1) :
+                substr_replace($sql, $value, strpos($sql, ':' . $key), strlen(':' . $key));
+        }
+        return rtrim($sql);
     }
 
     //取一行
@@ -473,16 +485,41 @@ class DbConnection
         return $this->sQuery->rowCount();
     }
 
+    public function incOrDec($name,$step=1)
+    {
+        $step=floatval($step);
+        if($step>0){
+            $set=" SET `{$name}`= `{$name}` + {$step}";
+        }else{
+            $set=" SET `{$name}`= `{$name}` {$step}";
+        }
+        $sql   = "UPDATE " . $this->table . $set . $this->where . $this->limit;
+        $this->query($sql);
+        return $this->sQuery->rowCount();
+    }
+
     public function update($data = array())
     {
         $_sql = array();
         foreach ($data as $key => $value) {
-            $_sql[] = "`$key`='$value'";
+            $_sql[] = "`$key`='".addslashes($value)."'";
         }
         $value = implode(',', $_sql);
         $sql   = "UPDATE " . $this->table . " SET $value " . $this->where . $this->limit;
-//        echo $sql;
         $this->query($sql);
+        return $this->sQuery->rowCount();
+    }
+
+    //没有绑定参数时可以使用
+    public function updateForNoBind($data = array())
+    {
+        $_sql = array();
+        foreach ($data as $key => $value) {
+            $_sql[] = "`$key`=:{$key}";
+        }
+        $_str = implode(',', $_sql);
+        $sql   = "UPDATE " . $this->table . " SET $_str " . $this->where . $this->limit;
+        $this->query($sql,$data);
         return $this->sQuery->rowCount();
     }
 
@@ -490,13 +527,16 @@ class DbConnection
     {
         $field = $value = '';
         foreach ($data as $key => $val) {
-            $field .= "`$key`,";
-            $value .= "'$val',";
+            if ($field == '') {
+                $field = "`{$key}`";
+                $value = ":{$key}";
+            } else {
+                $field .= ",`{$key}`";
+                $value .= ",:{$key}";
+            }
         }
-        $field = substr($field, 0, -1);
-        $value = substr($value, 0, -1);
-        $sql   = "INSERT INTO " . $this->table . " ($field) VALUES ($value)";
-        $this->query($sql);
+        $sql = "INSERT INTO " . $this->table . " ($field) VALUES ($value)";
+        $this->query($sql, $data);
         return $this->sQuery->rowCount();
     }
 

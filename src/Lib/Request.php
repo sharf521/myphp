@@ -46,14 +46,12 @@ class Request
             }
         } else {
             if ($safe) {
-                //$str = strip_tags(trim($str));
                 $str = htmlspecialchars($str, ENT_QUOTES);
                 $str = preg_replace('/</', '&lt;', $str);
                 $str = preg_replace('/>/', '&gt;', $str);
                 //$str = preg_replace('/\'/', '&#39;', $str);
                 //$str = preg_replace('/"/', '&quot;', $str);
             }
-            $str = addslashes($str);
         }
         return $str;
     }

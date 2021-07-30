@@ -205,7 +205,7 @@ class Model
                 $id = $this->$primaryKey;
                 unset($this->attributes[$this->primaryKey]);
             }
-            $num = DB::table($this->table)->where("{$primaryKey}=?")->bindValues($id)->limit('1')->update($this->attributes);
+            $num = DB::table($this->table)->where("`{$primaryKey}`='".addslashes($id)."'")->limit('1')->updateForNoBind($this->attributes);
             if ($new_key != 0) {
                 $this->$primaryKey = $new_key;
             }
