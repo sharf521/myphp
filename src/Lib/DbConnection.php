@@ -80,7 +80,7 @@ class DbConnection
             if (is_array($params)) {
                 foreach ($params as $k => $v) {
                     $_param = is_numeric($k) ? $k + 1 : ':' . $k;
-                    $this->sQuery->bindValue($_param, $v);
+                    $this->sQuery->bindValue($_param, (string)$v);
                 }
             }
             $tag=$this->sQuery->execute();
@@ -94,7 +94,7 @@ class DbConnection
                     if (is_array($params)) {
                         foreach ($params as $k => $v) {
                             $_param = is_numeric($k) ? $k + 1 : ':' . $k;
-                            $this->sQuery->bindValue($_param, $v);
+                            $this->sQuery->bindValue($_param, (string)$v);
                         }
                     }
                     $tag=$this->sQuery->execute();
