@@ -20,6 +20,26 @@ if (!function_exists('myErrorHandler')) {
     set_error_handler('myErrorHandler');
 }
 
+if (!function_exists('myShutdownFunction')) {
+    function myShutdownFunction()
+    {
+        if ($error = error_get_last()) {
+            $file_path = ROOT . "/public/data/logs/";
+            if (!is_dir($file_path)) {
+                mkdir($file_path, 0777, true);
+            }
+            $filename = $file_path . date("Ym") . ".log";
+            $handler  = null;
+            if (($handler = fopen($filename, 'ab+')) !== false) {
+                fwrite($handler, date('Y-m-d H:i:s') . " myShutdown: Type:{$error['type']}\t{$error['message']}\t{$error['file']}\t{$error['line']}\n");
+                fclose($handler);
+            }
+        }
+    }
+
+    register_shutdown_function('myShutdownFunction');
+}
+
 if (!function_exists('myExceptionHandler')) {
     function myExceptionHandler($e)
     {
@@ -41,7 +61,6 @@ if (!function_exists('myExceptionHandler')) {
             fwrite($handler, date('Y-m-d H:i:s') . "\t url:{$file} \t[{$error}\n");
             fclose($handler);
         }
-        exit;
     }
 
     set_exception_handler('myExceptionHandler');

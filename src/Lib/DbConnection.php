@@ -8,10 +8,14 @@ class DbConnection
      * @var \PDO
      */
     private $pdo = null;
-    private $dbfix;
+    private $dbfix='';
+    /**
+     * @var \PDOStatement
+     */
     private $sQuery;
-    private $join = array();
-    private $bindValues = array();
+    private $join = [];
+    private $bindValues = [];
+    private $expValues=[];
     private $select = '';
     private $distinct = '';
     private $table = '';
@@ -21,19 +25,19 @@ class DbConnection
     private $having = '';
     private $limit = '';
     private $lockForUpdate='';
-    private $debug = array();
-    private $settings=array();
+    private $debug = [];
+    private $settings=[];
 
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
     {
-        $this->settings = array(
+        $this->settings = [
             'host'     => $host,
             'port'     => $port,
             'user'     => $user,
             'password' => $password,
             'dbname'   => $db_name,
             'charset'  => $charset
-        );
+        ];
         $this->dbfix    = $dbfix;
         $this->connect();
     }
@@ -74,39 +78,33 @@ class DbConnection
         try {
             $this->sQuery = $this->pdo->prepare($query);
             if (is_array($params)) {
-                foreach ($params as $k => &$v) {
-                    if (is_string($k)) {
-                        $this->sQuery->bindParam(':' . $k, $v);
-                    } else {
-                        $this->sQuery->bindParam($k + 1, $v);
-                    }
+                foreach ($params as $k => $v) {
+                    $_param = is_numeric($k) ? $k + 1 : ':' . $k;
+                    $this->sQuery->bindValue($_param, (string)$v);
                 }
             }
             $tag=$this->sQuery->execute();
         } catch (\PDOException $e) {
-            $this->error_msg("1:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+            $this->error_msg("1:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
             if ($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
-               $this->closeConnection();
-               $this->connect();
-               try{
-                   $this->sQuery = $this->pdo->prepare($query);
-                   if (is_array($params)) {
-                       foreach ($params as $k => &$v) {
-                           if (is_string($k)) {
-                               $this->sQuery->bindParam(':' . $k, $v);
-                           } else {
-                               $this->sQuery->bindParam($k + 1, $v);
-                           }
-                       }
-                   }
-                   $tag=$this->sQuery->execute();
-               }catch (\PDOException $e){
-                   $this->error_msg("2:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
-                   $this->rollBack();
-                   throw $e;
-               }
+                $this->closeConnection();
+                $this->connect();
+                try{
+                    $this->sQuery = $this->pdo->prepare($query);
+                    if (is_array($params)) {
+                        foreach ($params as $k => $v) {
+                            $_param = is_numeric($k) ? $k + 1 : ':' . $k;
+                            $this->sQuery->bindValue($_param, (string)$v);
+                        }
+                    }
+                    $tag=$this->sQuery->execute();
+                }catch (\PDOException $e){
+                    $this->error_msg("2:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+                    $this->rollBack();
+                    throw $e;
+                }
             }else{
-                $this->error_msg("3:{$query}" . json_encode($params).',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+                $this->error_msg("3:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
                 $this->rollBack();
                 throw $e;
             }
@@ -186,6 +184,24 @@ class DbConnection
         }
     }
 
+
+    public function transaction(callable $callback)
+    {
+        $this->beginTransaction();
+        try {
+            $result = null;
+            if (is_callable($callback)) {
+                $result = $callback($this);
+            }
+            $this->commit();
+            return $result;
+        } catch (\Exception | \Throwable $e) {
+            $this->rollBack();
+            throw $e;
+        }
+    }
+
+
     //禁止克隆
     final public function __clone()
     {
@@ -263,10 +279,10 @@ class DbConnection
             $index = 0;
             $page  = 1;
         }
-/*        if ($index > $total) {
-            $index = 0;
-            $page  = 1;
-        }*/
+        /*        if ($index > $total) {
+                    $index = 0;
+                    $page  = 1;
+                }*/
         if ($total > 0) {
             $sql  = $_sql . " limit {$index}, {$pageSize}";
             $list = $this->get_all($sql, null, $mode);
@@ -395,14 +411,52 @@ class DbConnection
                 $this->bindValues[$key] = $val;
             }
         } else {
-            array_push($this->bindValues, $values);
+            $this->bindValues[]=$values;
         }
+        return $this;
+    }
+
+    //更新的数据需要使用SQL函数或者其它字段
+    public function exp(string $field, string $value)
+    {
+        $this->expValues[$field]=$value;
+        return $this;
+    }
+
+    //自增一个字段的值
+    public function inc($name,$step=1)
+    {
+        $step=floatval($step);
+        $this->exp($name,"`{$name}` + {$step}");
+        return $this;
+    }
+
+    //自减一个字段的值
+    public function dec($name,$step=1)
+    {
+        $step=floatval($step);
+        $this->exp($name,"`{$name}` - {$step}");
         return $this;
     }
 
     public function getSql()
     {
         return $this->buildSelect();
+    }
+
+    public function getRealSql($sql,$bind=[])
+    {
+        if(empty($bind)){
+            $bind = $this->bindValues;
+        }
+        foreach ($bind as $key => $value) {
+            $value = '\'' . addslashes($value) . '\'';
+            // 判断占位符
+            $sql = is_numeric($key) ?
+                substr_replace($sql, $value, strpos($sql, '?'), 1) :
+                substr_replace($sql, $value, strpos($sql, ':' . $key), strlen(':' . $key));
+        }
+        return rtrim($sql);
     }
 
     //取一行
@@ -475,34 +529,55 @@ class DbConnection
         return $this->sQuery->rowCount();
     }
 
-    public function update($data = array())
+    public function update(array $data = [])
     {
-        $_sql = array();
-        foreach ($data as $key => $value) {
-            $_sql[] = "`$key`='$value'";
+        $_sql =[];
+        if(!empty($this->expValues)){
+            foreach ($this->expValues as $key => $value) {
+                $_sql[] = "`$key`={$value}";
+            }
+        }else{
+            foreach ($data as $key => $value) {
+                $_sql[] = "`$key`='".addslashes($value)."'";
+            }
         }
         $value = implode(',', $_sql);
         $sql   = "UPDATE " . $this->table . " SET $value " . $this->where . $this->limit;
-//        echo $sql;
         $this->query($sql);
         return $this->sQuery->rowCount();
     }
 
-    public function insert($data = array())
+    //没有绑定参数时可以使用
+    public function updateForNoBind(array $data)
+    {
+        $_sql = array();
+        foreach ($data as $key => $value) {
+            $_sql[] = "`$key`=:{$key}";
+        }
+        $_str = implode(',', $_sql);
+        $sql   = "UPDATE " . $this->table . " SET $_str " . $this->where . $this->limit;
+        $this->query($sql,$data);
+        return $this->sQuery->rowCount();
+    }
+
+    public function insert(array $data)
     {
         $field = $value = '';
         foreach ($data as $key => $val) {
-            $field .= "`$key`,";
-            $value .= "'$val',";
+            if ($field == '') {
+                $field = "`{$key}`";
+                $value = ":{$key}";
+            } else {
+                $field .= ",`{$key}`";
+                $value .= ",:{$key}";
+            }
         }
-        $field = substr($field, 0, -1);
-        $value = substr($value, 0, -1);
-        $sql   = "INSERT INTO " . $this->table . " ($field) VALUES ($value)";
-        $this->query($sql);
+        $sql = "INSERT INTO " . $this->table . " ($field) VALUES ($value)";
+        $this->query($sql, $data);
         return $this->sQuery->rowCount();
     }
 
-    public function insertGetId($data = array())
+    public function insertGetId(array $data)
     {
         $num=$this->insert($data);
         if($num>0){
