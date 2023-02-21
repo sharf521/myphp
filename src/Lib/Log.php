@@ -11,7 +11,7 @@ namespace System\Lib;
 
 class Log
 {
-    public static function log($type='log',$data)
+    public static function log($type='log',$data,$ip=false)
     {
         $path = ROOT . "/public/data/logs/";
         if (!file_exists($path)) {
@@ -21,11 +21,15 @@ class Log
         if(is_array($data)){
             $data=json_encode($data);
         }
-        fwrite($logFile, '【'.date('Y-m-d H:i:s').'】'.$data."\r\n");
+        $str='【'.date('Y-m-d H:i:s').'】';
+        if($ip){
+            $str.="\t ip:".self::ip()."\t";
+        }
+        fwrite($logFile, $str.$data."\r\n");
         fclose($logFile);
     }
 
-/*    private function ip()
+    private static function ip()
     {
         if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
             $ip_address = $_SERVER["HTTP_CLIENT_IP"];
@@ -37,5 +41,5 @@ class Log
             $ip_address = '';
         }
         return $ip_address;
-    }*/
+    }
 }

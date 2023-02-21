@@ -5,16 +5,7 @@ if (!function_exists('myErrorHandler')) {
         if ($errNo == E_NOTICE) {
             return true;
         }
-        $file_path = ROOT . "/public/data/logs/";
-        if (!is_dir($file_path)) {
-            mkdir($file_path, 0777, true);
-        }
-        $filename = $file_path . date("Ym") . ".log";
-        $handler  = null;
-        if (($handler = fopen($filename, 'ab+')) !== false) {
-            fwrite($handler, date('Y-m-d H:i:s') . "\t[{$errNo}]{$errStr}\t{$errFile}\t{$errLine}\n");
-            fclose($handler);
-        }
+        \System\Lib\Log::log("error", "[{$errNo}]{$errStr}\t{$errFile}\t{$errLine}\n");
     }
 
     set_error_handler('myErrorHandler');
@@ -24,16 +15,7 @@ if (!function_exists('myShutdownFunction')) {
     function myShutdownFunction()
     {
         if ($error = error_get_last()) {
-            $file_path = ROOT . "/public/data/logs/";
-            if (!is_dir($file_path)) {
-                mkdir($file_path, 0777, true);
-            }
-            $filename = $file_path . date("Ym") . ".log";
-            $handler  = null;
-            if (($handler = fopen($filename, 'ab+')) !== false) {
-                fwrite($handler, date('Y-m-d H:i:s') . " myShutdown: Type:{$error['type']}\t{$error['message']}\t{$error['file']}\t{$error['line']}\n");
-                fclose($handler);
-            }
+            \System\Lib\Log::log("myShutdown", "Type:{$error['type']}\t{$error['message']}\t{$error['file']}\t{$error['line']}\n");
         }
     }
 
@@ -48,19 +30,9 @@ if (!function_exists('myExceptionHandler')) {
             'return_msg'  => $e->getMessage()
         );
         echo json_encode($data);
-
-        $file_path = ROOT . "/public/data/logs/";
-        if (!is_dir($file_path)) {
-            mkdir($file_path, 0777, true);
-        }
-        $filename = $file_path . date("Ym") . "exception.log";
-        $handler  = null;
-        if (($handler = fopen($filename, 'ab+')) !== false) {
-            $file  = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
-            $error = $e->getFile() . " Line " . $e->getLine() . " " . $e->getMessage();
-            fwrite($handler, date('Y-m-d H:i:s') . "\t url:{$file} \t[{$error}\n");
-            fclose($handler);
-        }
+        $file  = (new \System\Lib\Request())->url();
+        $error = $e->getFile() . " Line " . $e->getLine() . " " . $e->getMessage();
+        \System\Lib\Log::log("exception", "url:{$file} \t[{$error}\n");
     }
 
     set_exception_handler('myExceptionHandler');

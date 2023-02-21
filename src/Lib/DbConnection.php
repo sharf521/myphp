@@ -8,14 +8,14 @@ class DbConnection
      * @var \PDO
      */
     private $pdo = null;
-    private $dbfix='';
+    private $dbfix = '';
     /**
      * @var \PDOStatement
      */
     private $sQuery;
     private $join = [];
     private $bindValues = [];
-    private $expValues=[];
+    private $expValues = [];
     private $select = '';
     private $distinct = '';
     private $table = '';
@@ -24,9 +24,9 @@ class DbConnection
     private $groupBy = '';
     private $having = '';
     private $limit = '';
-    private $lockForUpdate='';
+    private $lockForUpdate = '';
     private $debug = [];
-    private $settings=[];
+    private $settings = [];
 
     public function __construct($host, $port, $user, $password, $db_name, $charset = 'utf8', $dbfix = '')
     {
@@ -69,7 +69,7 @@ class DbConnection
 
     public function query($query, $params = null)
     {
-        $tag=false;
+        $tag = false;
         if ($params == null) {
             $params = $this->bindValues;
         }
@@ -83,13 +83,12 @@ class DbConnection
                     $this->sQuery->bindValue($_param, (string)$v);
                 }
             }
-            $tag=$this->sQuery->execute();
+            $tag = $this->sQuery->execute();
         } catch (\PDOException $e) {
-            $this->error_msg("1:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
             if ($e->errorInfo[1] == 2006 || $e->errorInfo[1] == 2013) {
                 $this->closeConnection();
                 $this->connect();
-                try{
+                try {
                     $this->sQuery = $this->pdo->prepare($query);
                     if (is_array($params)) {
                         foreach ($params as $k => $v) {
@@ -97,14 +96,14 @@ class DbConnection
                             $this->sQuery->bindValue($_param, (string)$v);
                         }
                     }
-                    $tag=$this->sQuery->execute();
-                }catch (\PDOException $e){
-                    $this->error_msg("2:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+                    $tag = $this->sQuery->execute();
+                } catch (\PDOException $e) {
+                    $this->error_msg("1:{$this->getRealSql($query,$params)}" . ',msg:' . $e->getMessage() . '，info:' . json_encode($e->errorInfo));
                     $this->rollBack();
                     throw $e;
                 }
-            }else{
-                $this->error_msg("3:{$this->getRealSql($query,$params)}" .',msg:'.$e->getMessage().'，info:'.json_encode($e->errorInfo));
+            } else {
+                $this->error_msg("2:{$this->getRealSql($query,$params)}" . ',msg:' . $e->getMessage() . '，info:' . json_encode($e->errorInfo));
                 $this->rollBack();
                 throw $e;
             }
@@ -126,18 +125,8 @@ class DbConnection
 
     private function error_msg($msg)
     {
-        $file_path = ROOT . "/public/data/logs/";
-        if (!is_dir($file_path)) {
-            mkdir($file_path, 0777, true);
-        }
-        $filename = $file_path . date("Ym") . ".log";
-        $fp       = fopen($filename, "a+");
-        $time     = date('Y-m-d H:i:s');
-        $ip       = $this->ip();
-        $file     = "http://" . $_SERVER['HTTP_HOST'] . $_SERVER["REQUEST_URI"];
-        $str      = "time:{$time}\t ip:{$ip}}\t{error:" . $msg . "}\t file:{$file}\t\r\n";
-        fputs($fp, $str);
-        fclose($fp);
+        $str = "{error:" . $msg . "}\t file:" . (new Request())->url() . "\t\r\n";
+        Log::log('DB', $str, true);
     }
 
     public function get_one($sql, $param = null, $mode = \PDO::FETCH_ASSOC)
@@ -184,7 +173,6 @@ class DbConnection
         }
     }
 
-
     public function transaction(callable $callback)
     {
         $this->beginTransaction();
@@ -201,7 +189,6 @@ class DbConnection
         }
     }
 
-
     //禁止克隆
     final public function __clone()
     {
@@ -217,17 +204,17 @@ class DbConnection
     //////////////////////////////////////
     protected function reset()
     {
-        $this->distinct   = '';
-        $this->select     = '';
-        $this->table      = '';
-        $this->join       = array();
-        $this->bindValues = array();
-        $this->where      = '';
-        $this->groupBy    = '';
-        $this->having     = '';
-        $this->orderBy    = '';
-        $this->limit      = '';
-        $this->lockForUpdate='';
+        $this->distinct      = '';
+        $this->select        = '';
+        $this->table         = '';
+        $this->join          = array();
+        $this->bindValues    = array();
+        $this->where         = '';
+        $this->groupBy       = '';
+        $this->having        = '';
+        $this->orderBy       = '';
+        $this->limit         = '';
+        $this->lockForUpdate = '';
     }
 
     private function buildSelect()
@@ -248,7 +235,7 @@ class DbConnection
 
     public function page($page = 1, $pageSize = 10, $mode = \PDO::FETCH_ASSOC)
     {
-        $_sql  = $this->buildSelect() ;
+        $_sql = $this->buildSelect();
         if ($this->groupBy != '') {
             $sql1             = "SELECT {$this->distinct} 1 FROM {$this->table}"
                 . $this->buildJoin()
@@ -343,11 +330,11 @@ class DbConnection
         array_push($this->join, " {$join} JOIN {$table} ON {$cond} ");
     }
 
-    public function distinct($columns=array())
+    public function distinct($columns = array())
     {
-        if(is_array($columns) && count($columns)>0){
-            $this->distinct = 'distinct '.implode(', ',$columns);
-        }else{
+        if (is_array($columns) && count($columns) > 0) {
+            $this->distinct = 'distinct ' . implode(', ', $columns);
+        } else {
             $this->distinct = 'distinct';
         }
         return $this;
@@ -400,7 +387,7 @@ class DbConnection
 
     public function lockForUpdate()
     {
-        $this->lockForUpdate=' for update';
+        $this->lockForUpdate = ' for update';
         return $this;
     }
 
@@ -411,7 +398,7 @@ class DbConnection
                 $this->bindValues[$key] = $val;
             }
         } else {
-            $this->bindValues[]=$values;
+            $this->bindValues[] = $values;
         }
         return $this;
     }
@@ -419,23 +406,23 @@ class DbConnection
     //更新的数据需要使用SQL函数或者其它字段
     public function exp(string $field, string $value)
     {
-        $this->expValues[$field]=$value;
+        $this->expValues[$field] = $value;
         return $this;
     }
 
     //自增一个字段的值
-    public function inc($name,$step=1)
+    public function inc($name, $step = 1)
     {
-        $step=floatval($step);
-        $this->exp($name,"`{$name}` + {$step}");
+        $step = floatval($step);
+        $this->exp($name, "`{$name}` + {$step}");
         return $this;
     }
 
     //自减一个字段的值
-    public function dec($name,$step=1)
+    public function dec($name, $step = 1)
     {
-        $step=floatval($step);
-        $this->exp($name,"`{$name}` - {$step}");
+        $step = floatval($step);
+        $this->exp($name, "`{$name}` - {$step}");
         return $this;
     }
 
@@ -444,9 +431,9 @@ class DbConnection
         return $this->buildSelect();
     }
 
-    public function getRealSql($sql,$bind=[])
+    public function getRealSql($sql, $bind = [])
     {
-        if(empty($bind)){
+        if (empty($bind)) {
             $bind = $this->bindValues;
         }
         foreach ($bind as $key => $value) {
@@ -462,7 +449,7 @@ class DbConnection
     //取一行
     public function row($mode = \PDO::FETCH_ASSOC)
     {
-        if($this->limit==''){
+        if ($this->limit == '') {
             $this->limit('1');//只能返回一行
         }
         $sql = $this->buildSelect();
@@ -531,14 +518,14 @@ class DbConnection
 
     public function update(array $data = [])
     {
-        $_sql =[];
-        if(!empty($this->expValues)){
+        $_sql = [];
+        if (!empty($this->expValues)) {
             foreach ($this->expValues as $key => $value) {
                 $_sql[] = "`$key`={$value}";
             }
-        }else{
+        } else {
             foreach ($data as $key => $value) {
-                $_sql[] = "`$key`='".addslashes($value)."'";
+                $_sql[] = "`$key`='" . addslashes($value) . "'";
             }
         }
         $value = implode(',', $_sql);
@@ -555,8 +542,8 @@ class DbConnection
             $_sql[] = "`$key`=:{$key}";
         }
         $_str = implode(',', $_sql);
-        $sql   = "UPDATE " . $this->table . " SET $_str " . $this->where . $this->limit;
-        $this->query($sql,$data);
+        $sql  = "UPDATE " . $this->table . " SET $_str " . $this->where . $this->limit;
+        $this->query($sql, $data);
         return $this->sQuery->rowCount();
     }
 
@@ -579,8 +566,8 @@ class DbConnection
 
     public function insertGetId(array $data)
     {
-        $num=$this->insert($data);
-        if($num>0){
+        $num = $this->insert($data);
+        if ($num > 0) {
             return $this->pdo->lastInsertId();
         }
         return 0;
@@ -589,19 +576,5 @@ class DbConnection
     public function lastInsertId()
     {
         return $this->pdo->lastInsertId();
-    }
-
-    private function ip()
-    {
-        if (!empty($_SERVER["HTTP_CLIENT_IP"])) {
-            $ip_address = $_SERVER["HTTP_CLIENT_IP"];
-        } else if (!empty($_SERVER["HTTP_X_FORWARDED_FOR"])) {
-            $ip_address = array_pop(explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']));
-        } else if (!empty($_SERVER["REMOTE_ADDR"])) {
-            $ip_address = $_SERVER["REMOTE_ADDR"];
-        } else {
-            $ip_address = '';
-        }
-        return $ip_address;
     }
 }
