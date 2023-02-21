@@ -195,7 +195,7 @@ class DbConnection
             }
             $this->commit();
             return $result;
-        } catch (\Exception | \Throwable $e) {
+        } catch (\Exception $e) {
             $this->rollBack();
             throw $e;
         }
