@@ -29,7 +29,7 @@ if (!function_exists('myExceptionHandler')) {
             'return_code' => 'fail',
             'return_msg'  => $e->getMessage()
         );
-        echo json_encode($data);
+        echo json_encode($data, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
         $file  = (new \System\Lib\Request())->url();
         $error = $e->getFile() . " Line " . $e->getLine() . " " . $e->getMessage();
         \System\Lib\Log::log("exception", "url:{$file} \t[{$error}\n");

@@ -19,7 +19,7 @@ class Log
         }
         $logFile = fopen($path.'log'.$type.'_'.date('Ym').".txt", "a+");
         if(is_array($data)){
-            $data=json_encode($data);
+            $data=json_encode($data, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
         }
         $str='【'.date('Y-m-d H:i:s').'】';
         if($ip){

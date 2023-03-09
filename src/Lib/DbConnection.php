@@ -98,12 +98,12 @@ class DbConnection
                     }
                     $tag = $this->sQuery->execute();
                 } catch (\PDOException $e) {
-                    $this->error_msg("1:{$this->getRealSql($query,$params)}" . ',msg:' . $e->getMessage() . '，info:' . json_encode($e->errorInfo));
+                    $this->error_msg("1:{$this->getRealSql($query,$params)}" . ',msg:' . $e->getMessage() . '，info:' . json_encode($e->errorInfo,JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE));
                     $this->rollBack();
                     throw $e;
                 }
             } else {
-                $this->error_msg("2:{$this->getRealSql($query,$params)}" . ',msg:' . $e->getMessage() . '，info:' . json_encode($e->errorInfo));
+                $this->error_msg("2:{$this->getRealSql($query,$params)}" . ',msg:' . $e->getMessage() . '，info:' . json_encode($e->errorInfo, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE));
                 $this->rollBack();
                 throw $e;
             }
